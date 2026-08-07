@@ -4,6 +4,8 @@ export type userMood = "unhappy" | "somewhat_unhappy" | "neutral" | "somewhat_ha
 
 export type NavItem =  'home' | 'doctors notes' | 'journal' | 'settings';
 
+export type NoteColor = "red" | "yellow" | "green" | "purple";
+
 export interface userProfile{
     first_name: string,
     last_name: string,
@@ -18,5 +20,7 @@ export interface userProfile{
 export type userNote = {
     title : string,
     description : string,
-    color: string,
+    color: NoteColor,
+    noteId?: number | string,
+    date?: Date | string,
 }

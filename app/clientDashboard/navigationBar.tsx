@@ -27,7 +27,7 @@ export default function navigationBar({active, onChange}: Props){
     const [pageState, setPageState] = useState<NavItem>(active);
     
     return(
-        <nav className="flex flex-col bg-[#EDF1EC] w-20 ml-5 my-5 px-3 rounded-lg">
+        <nav className="flex flex-col bg-[#EDF1EC] w-20  my-5 px-3 rounded-lg">
             {/* logo element */}
 
             {/* home, Doctors notes and my notes */}

@@ -4,31 +4,30 @@ import { useState } from "react";
 import saveIcon from "../../public/icons/Save.svg";
 import deleteIcon from "../../public/icons/delete.svg"; 
 import closeIcon from "../../public/icons/close.svg";
+import { userNote, NoteColor } from "../types";
 
 type Props = {
     onClose : () => void;
-    onSave : (note: {title : string , description : string, color : string}) => void;
-    noteTitle : string,
-    noteDescription : string,
-    noteColor : string, 
+    onSave : (note: {title : string , description : string, color : string, noteId? : number | string}) => void;
+    initialNote? : userNote;
 }
 
-type NoteColor = "red" | "yellow" | "green" | "purple";
 
 const COLORS: {id: NoteColor, color: string}[] = [
     {id : 'red' , color : '#F29191'},
     {id: 'yellow', color : '#F2D891'},
     {id : 'green', color : '#A8F291'},
     {id : 'purple', color : '#9196F2'}
-] 
+] as const
 
 
 
-export function NoteModal({onClose, onSave, noteTitle, noteColor, noteDescription} : Props){
-    const [title, setTitle] = useState(noteTitle);
-    const [description, setDescription] = useState(noteDescription);
-    const [color, setColor] = useState<NoteColor>(noteColor);
-    const activeColor = COLORS.find((c) => c.id === noteColor)?.color ?? COLORS[0].color;
+export function NoteModal({onClose, onSave, initialNote ={title: "" , description: "", color: "red"}} : Props){
+    const [title, setTitle] = useState(initialNote.title);
+    const [description, setDescription] = useState(initialNote.description);
+    const [color, setColor] = useState<NoteColor>(initialNote.color);
+    const noteId = initialNote.noteId;
+    const activeColor = COLORS.find((c) => c.id === color)?.color ?? COLORS[0].color;
 
 
 
@@ -44,7 +43,7 @@ export function NoteModal({onClose, onSave, noteTitle, noteColor, noteDescriptio
                 text-black font-inter duration-200 flex flex-col rounded-t-4xl "
                 onClick={(e) => {e.stopPropagation()}}>
                 {/* close button */}
-                    <h3 className="text-5xl font-serif">New Note</h3>
+                    {/* <h3 className="text-5xl font-serif">New Note</h3> */}
                     <div className="flex gap-2 mt-1">
                         {COLORS.map(({id, color}) => (
                             <button
@@ -95,7 +94,15 @@ export function NoteModal({onClose, onSave, noteTitle, noteColor, noteDescriptio
                         </button>
                         <button className="bg-[#45733F] p-1 rounded-md 
                             text-white hover:cursor-pointer inline-flex items-center 
-                            justify-center gap-1 hover:bg-[#3A6235] hover:p-2 duration-200">
+                            justify-center gap-1 hover:bg-[#3A6235] hover:p-2 duration-200"
+                            onClick={() => {
+                                if(initialNote.noteId){
+                                    onSave({title, description, color, noteId})}
+                                else{
+                                    onSave({title, description, color})
+                                }
+                                onClose();
+                                }}>
                                 <img
                                 src={typeof saveIcon === "string"? saveIcon : saveIcon.src }
                                 alt="save icon"

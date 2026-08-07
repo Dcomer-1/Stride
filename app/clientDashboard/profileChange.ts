@@ -58,23 +58,29 @@ export async function createNote(noteTitle: string, noteDescription: string, not
 
 }
 
-export async function showAllNotes(noteTitle: string, noteDescription: string, noteColor: string){
+export async function showAllNotes(){
     const supabase = await createClient();
     const {data: {user} } = await supabase.auth.getUser();
-    const {error : updateError} = await supabase.from("Notes")
-    .select("id, title, description, color, created_at")
-    .eq('user_id',user?.id)
-    
-    if(updateError){
-        return Error(updateError.message)    
+
+    if(!user){
+        return { error: "Not signed in", notes: [] as const };
     }
 
-    return {success : true}    
+    const { data, error } = await supabase.from("Notes")
+    .select("id, title, description, color, created_at")
+    .eq('user_id', user.id)
+    .order("created_at", { ascending: false });
+    
+    if(error){
+        return { error: error.message, notes: [] as const };    
+    }
+
+    return { notes: data ?? [] };    
 }
 
 
 
-export async function updateNote(noteTitle: string, noteDescription: string, noteColor: string, noteId: number){
+export async function updateNote(noteTitle: string, noteDescription: string, noteColor: string, noteId: number | string){
     const supabase = await createClient();
     const {data: {user} } = await supabase.auth.getUser();
     const {error : updateError} = await supabase.from("Notes")
