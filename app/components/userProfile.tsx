@@ -4,9 +4,11 @@ import SentimentSatisfiedRoundedIcon from '@mui/icons-material/SentimentSatisfie
 import SentimentNeutralRoundedIcon from '@mui/icons-material/SentimentNeutralRounded';
 import SentimentDissatisfiedRoundedIcon from '@mui/icons-material/SentimentDissatisfiedRounded';
 import { useEffect, useState } from 'react';
-import { updateMood } from './profileChange';
+import { updateMood } from '../clientDashboard/profileChange';
 import GoalField from './goalField';
 import type {userProfile} from '../types';
+import Image from 'next/image';
+import  MenuButton from "../../public/icons/Menu.svg"
 
 type userMood = "unhappy" | "somewhat_unhappy" | "neutral" | "somewhat_happy" | "happy";
 
@@ -32,7 +34,7 @@ export default function userProfile({profile}: {profile: userProfile}){
 
     return(
     <div className="flex w-fit flex-col bg-[#EDF1EC] p-5 my-5 rounded-lg">
-        <div className="flex flex-col justify-center items-center gap-4">
+        <div className="flex flex-col justify-center items-center gap-4 mt-10">
             <h2 className="text-black font-serif text-5xl">Welcome!</h2>
             <div className=" text-black font-semibold bg-white rounded-full p-1 mt-3 duration-300 ">
                 <PersonRoundedIcon sx={{color: "currentColor", fontSize:50}}/>

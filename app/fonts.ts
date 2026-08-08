@@ -13,7 +13,7 @@ export const geistMono = Geist_Mono({
 export const sourceSerif = Source_Serif_4({
   variable: "--font-source-serif",
   subsets: ["latin"],
-  weight: ["400", "600", "700"],
+  weight: ["300", "400", "600", "700"],
 });
 
 export const shadowsIntoLight = Shadows_Into_Light({

@@ -1,10 +1,11 @@
 "use client"
 import { useEffect, useState } from "react";
-import NavigationBar from "./navigationBar";
-import UserProfile from "./userProfile";
+import NavigationBar from "../components/navigationBar";
+import UserProfile from "../components/userProfile";
 import type {userProfile} from '../types';
 import type {NavItem} from '../types';
 import Journal from "./states/journal";
+import Home from "./states/home";
 
 
 export default function ClientDashboardShell({profile} : {profile : userProfile}){
@@ -15,6 +16,7 @@ export default function ClientDashboardShell({profile} : {profile : userProfile}
     <div className="h-full w-screen bg-white overflow-x-hidden flex px-5">
         <NavigationBar active={tab} onChange={setTab} />
         {tab === 'journal' && <Journal/>}
+        {tab === 'home' && <Home/>}
         <UserProfile profile={profile}/>
     </div>
     );

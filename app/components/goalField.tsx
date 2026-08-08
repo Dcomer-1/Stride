@@ -2,7 +2,7 @@ import { SubmitEvent, useEffect, useState } from "react";
 import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
 import saveIcon from "../../public/icons/Save.svg";
 import deleteIcon from "../../public/icons/delete.svg"; 
-import { clearGoal, updateGoal } from "./profileChange";
+import { clearGoal, updateGoal } from "../clientDashboard/profileChange";
 
 
 

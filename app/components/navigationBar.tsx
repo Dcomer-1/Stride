@@ -8,6 +8,7 @@ import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 import Image from "next/image";
 import { useState } from 'react';
 import type {NavItem} from '../types';
+import SettingsMenu from './settings';
 
 
 type Props = {
@@ -19,7 +20,7 @@ const navIcons: {id: NavItem, label: string, Icon?: typeof EditNoteRoundedIcon}[
     {id: 'home', label: 'Home', Icon: HomeRoundedIcon },
     {id: 'doctors notes', label: "Doctor's Notes", Icon: MedicalInformationRoundedIcon },
     {id: 'journal', label: 'Journal', Icon: EditNoteRoundedIcon},
-    {id: 'settings', label: 'Settings', Icon: SettingsRoundedIcon},
+    // {id: 'settings', label: 'Settings', Icon: SettingsRoundedIcon},
     
 ]
 
@@ -49,8 +50,9 @@ export default function navigationBar({active, onChange}: Props){
             </div>    
 
             {/* Setting, and profile picture */} 
-            <div className="flex flex-col items-center mt-auto mb-5">
-                <div className=" text-black bg-white rounded-full p-1  duration-300 
+            <div className="flex flex-col items-center mt-auto mb-5 gap-6">
+                <SettingsMenu/>
+                <div className=" text-black bg-white rounded-full p-2  duration-300 
                 ">
                     <PersonRoundedIcon sx={{color: "currentColor", fontSize:35}}/>
                 </div>                   

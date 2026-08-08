@@ -56,7 +56,7 @@ export default function SignInForm() {
         />
         <input
           type="submit"
-          value={'Register'}
+          value={'Log In'}
           className="rounded-md text-white bg-black my-2 p-2
       cursor-pointer hover:opacity-90"
         />

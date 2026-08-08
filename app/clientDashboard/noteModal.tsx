@@ -35,13 +35,14 @@ export function NoteModal({onClose, onSave, initialNote ={title: "" , descriptio
         // dim background
         <div
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-        >
+        onClick={onClose}>
            
             <div className={`p-4 pt-15 flex flex-col max-w-2xl w-full rounded-4xl`}
-            style={{background : activeColor}}>
+            style={{background : activeColor}}
+            onClick={(e) => e.stopPropagation()}>
                 <div className="bg-white w-full max-w-2xl rounded-2xl p-6 shadow-lg 
                 text-black font-inter duration-200 flex flex-col rounded-t-4xl "
-                onClick={(e) => {e.stopPropagation()}}>
+                >
                 {/* close button */}
                     {/* <h3 className="text-5xl font-serif">New Note</h3> */}
                     <div className="flex gap-2 mt-1">

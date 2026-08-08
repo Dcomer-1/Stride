@@ -97,3 +97,13 @@ export async function updateNote(noteTitle: string, noteDescription: string, not
 
 }
 
+export async function signOut(){
+    const supabase = await createClient();
+    const {error : signOutError} = await supabase.auth.signOut();
+
+    if(signOutError){
+        return Error(signOutError.message)
+    }
+
+    return {sucess : true}
+}

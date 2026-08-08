@@ -1,7 +1,7 @@
 
 import { ResponseAbortedName } from "next/dist/server/web/spec-extension/adapters/next-request";
-import NavigationBar from "./navigationBar";
-import UserProfile from "./userProfile";
+import NavigationBar from "../components/navigationBar";
+import UserProfile from "../components/userProfile";
 import { createClient} from '@supabase/supabase-js';
 import ClientDashboardShell from "./clientDashboardShell";
 
