@@ -23,4 +23,5 @@ export type userNote = {
     color: NoteColor,
     noteId?: number | string,
     date?: Date | string,
+    authorName?: string,
 }

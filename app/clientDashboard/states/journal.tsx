@@ -2,10 +2,10 @@
 
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
 import { useEffect, useState } from 'react';
-import { NoteModal } from '../noteModal';
+import { NoteModal } from '../../components/noteModal';
 import { createNote, updateNote, showAllNotes } from '../profileChange';
 import { userNote, NoteColor } from '@/app/types';
-import NoteCard from '../noteCard';
+import NoteCard from '../../components/noteCard';
 
 function toNoteColor(value: string): NoteColor {
     if (value === "red" || value === "yellow" || value === "green" || value === "purple") {
@@ -83,6 +83,7 @@ export default function Journal(){
                     }}
                     onSave={handleSave}
                     initialNote={editingNote ?? undefined}
+                    readOnlyView={false}
                 />
             )}
                  

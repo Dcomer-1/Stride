@@ -4,8 +4,8 @@ import { NoteColor, userNote } from "@/app/types";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { createNote, showAllNotes, updateNote } from "../profileChange";
-import NoteCard from "../noteCard";
-import { NoteModal } from "../noteModal";
+import NoteCard from "../../components/noteCard";
+import { NoteModal } from "../../components/noteModal";
 import { Button } from "@/components/ui/button";
 import {
   Carousel,
@@ -215,6 +215,7 @@ export default function Home() {
           }}
           onSave={handleSave}
           initialNote={editingNote ?? undefined}
+          readOnlyView={false}
         />
       )}
 

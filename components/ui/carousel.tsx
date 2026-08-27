@@ -171,6 +171,14 @@ function CarouselItem({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+function useHasMounted() {
+  const [mounted, setMounted] = React.useState(false)
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+  return mounted
+}
+
 function CarouselPrevious({
   className,
   variant = "outline",
@@ -178,6 +186,9 @@ function CarouselPrevious({
   ...props
 }: React.ComponentProps<typeof Button>) {
   const { orientation, scrollPrev, canScrollPrev } = useCarousel()
+  const mounted = useHasMounted()
+
+  if (!mounted) return null
 
   return (
     <Button
@@ -208,6 +219,9 @@ function CarouselNext({
   ...props
 }: React.ComponentProps<typeof Button>) {
   const { orientation, scrollNext, canScrollNext } = useCarousel()
+  const mounted = useHasMounted()
+
+  if (!mounted) return null
 
   return (
     <Button

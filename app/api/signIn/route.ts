@@ -16,9 +16,13 @@ export async function POST(req: NextRequest){
         email: normalizedEmail,
         password: password,
     })
-    if(data.user?.aud === "authenticated"){
-        return Response.json({success:true, message: "User Successfully Authenticated"},)
+    const {data : roleData, error : roleError} = await supabase.from("Users").select("role").eq(
+        "auth_user_id", data.user?.id).maybeSingle()
+    
+    
+    if(data.user?.aud === "authenticated" && !error && !roleError){
+        return Response.json({success:true, role : roleData?.role},)
     }else{
-        return Response.json({success: false, error: error?.message})
+        return Response.json({success: false, error: error?.message, roleError: roleError?.message})
     }
 }

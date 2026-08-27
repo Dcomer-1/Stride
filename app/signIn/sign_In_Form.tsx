@@ -19,9 +19,13 @@ export default function SignInForm() {
       body: formData,
     })
     const data = await response.json();
-
     if(data.success){
-      router.push('/clientDashboard')
+      // This needs to request role and sign user into dashboard respectively
+      if(data.role === "user"){
+        router.push('/clientDashboard')
+      }else if(data.role === "admin"){
+        router.push('/providerDashboard')
+      }
     }else{
       console.log(data)
     }
