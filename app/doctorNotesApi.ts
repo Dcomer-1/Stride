@@ -32,6 +32,7 @@ function mapDoctorNote(row: {
   color: string;
   created_at: string;
   author_name?: string;
+  client_note_id?: number | string;
 }): userNote {
   return {
     noteId: row.id,
@@ -40,6 +41,7 @@ function mapDoctorNote(row: {
     color: toNoteColor(row.color),
     date: row.created_at,
     authorName: row.author_name,
+    clientNoteId: row.client_note_id,
   };
 }
 
@@ -61,7 +63,7 @@ async function requireAdmin() {
     .maybeSingle();
 
   if (roleError) {
-    return { error: roleError.message as const };
+    return { error: roleError.message};
   }
   if (roleRow?.role !== "admin") {
     return { error: "Forbidden" as const };
@@ -91,7 +93,7 @@ export async function getDoctorNoteForClientNote(clientNoteId: number | string) 
 
   const { data, error } = await client
     .from("DoctorNotes")
-    .select("id, title, description, color, created_at, author_id")
+    .select("id, title, description, color, created_at, author_id, client_note_id")
     .eq("client_note_id", clientNoteId)
     .maybeSingle();
 
@@ -116,7 +118,57 @@ export async function getDoctorNoteForClientNote(clientNoteId: number | string) 
   }
 
   return {
-    note: mapDoctorNote({ ...data, author_name: authorName }),
+    note: mapDoctorNote({ ...data, author_name: authorName, client_note_id: data.client_note_id }),
+  };
+}
+
+export async function getDoctorNotesForPatient() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not signed in", notes: [] as userNote[] };
+  }
+
+  const { data, error } = await supabase
+    .from("DoctorNotes")
+    .select("id, title, description, color, created_at, author_id, client_note_id")
+    .eq("patient_user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return { error: error.message, notes: [] as userNote[] };
+  }
+
+  const notes = data ?? [];
+  const authorIds = [...new Set(notes.map((note) => note.author_id).filter(Boolean))];
+
+  let nameByAuthorId = new Map<string, string>();
+  if (authorIds.length > 0) {
+    const admin = getAdminClient();
+    const { data: authors } = await admin
+      .from("Users")
+      .select("auth_user_id, first_name, last_name")
+      .in("auth_user_id", authorIds);
+
+    nameByAuthorId = new Map(
+      (authors ?? []).map((author) => [
+        author.auth_user_id as string,
+        `${author.first_name ?? ""} ${author.last_name ?? ""}`.trim(),
+      ]),
+    );
+  }
+
+  return {
+    notes: notes.map((note) =>
+      mapDoctorNote({
+        ...note,
+        author_name: nameByAuthorId.get(note.author_id),
+        client_note_id: note.client_note_id,
+      }),
+    ),
   };
 }
 

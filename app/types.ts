@@ -25,4 +25,5 @@ export type userNote = {
     date?: Date | string,
     authorName?: string,
     patientUserId?: string,
+    clientNoteId?: number | string,
 }

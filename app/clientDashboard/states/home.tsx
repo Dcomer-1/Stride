@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { createNote, showAllNotes, updateNote } from "../profileChange";
 import NoteCard from "../../components/noteCard";
 import { SplitNoteModal } from "../../components/splitNoteModal";
-import { getDoctorNoteForClientNote } from "@/app/doctorNotesApi";
+import { getDoctorNoteForClientNote, getDoctorNotesForPatient } from "@/app/doctorNotesApi";
 import { Button } from "@/components/ui/button";
 import {
   Carousel,
@@ -77,12 +77,17 @@ export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<userNote | null>(null);
   const [doctorNote, setDoctorNote] = useState<userNote | null>(null);
+  const [clientReadOnly, setClientReadOnly] = useState(false);
   const [personalNotes, setPersonalNotes] = useState<userNote[]>([]);
+  const [doctorNotes, setDoctorNotes] = useState<userNote[]>([]);
   const [filter, setFilter] = useState<NoteFilter>("week");
   const [monthCursor, setMonthCursor] = useState(() => new Date());
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
+  const [doctorCarouselApi, setDoctorCarouselApi] = useState<CarouselApi>();
+  const [doctorCanScrollPrev, setDoctorCanScrollPrev] = useState(false);
+  const [doctorCanScrollNext, setDoctorCanScrollNext] = useState(false);
 
   async function loadNotes() {
     const result = await showAllNotes();
@@ -91,8 +96,19 @@ export default function Home() {
     }
   }
 
+  async function loadDoctorNotes() {
+    const result = await getDoctorNotesForPatient();
+    if (result.error) {
+      console.error("getDoctorNotesForPatient:", result.error);
+      setDoctorNotes([]);
+      return;
+    }
+    setDoctorNotes(result.notes);
+  }
+
   useEffect(() => {
     loadNotes();
+    loadDoctorNotes();
   }, []);
 
   function todayFilter(notes: userNote[]) {
@@ -135,6 +151,8 @@ export default function Home() {
   const activeFilter = FILTERS.find((f) => f.id === filter);
   const visibleNotes =
     activeFilter?.filter?.(personalNotes) ?? personalNotes;
+  const visibleDoctorNotes =
+    activeFilter?.filter?.(doctorNotes) ?? doctorNotes;
 
   useEffect(() => {
     if (!carouselApi) return;
@@ -156,13 +174,35 @@ export default function Home() {
     };
   }, [carouselApi, visibleNotes.length]);
 
+  useEffect(() => {
+    if (!doctorCarouselApi) return;
+
+    const syncOverflow = () => {
+      setDoctorCanScrollPrev(doctorCarouselApi.canScrollPrev());
+      setDoctorCanScrollNext(doctorCarouselApi.canScrollNext());
+    };
+
+    syncOverflow();
+    doctorCarouselApi.on("select", syncOverflow);
+    doctorCarouselApi.on("reInit", syncOverflow);
+    doctorCarouselApi.on("settle", syncOverflow);
+
+    return () => {
+      doctorCarouselApi.off("select", syncOverflow);
+      doctorCarouselApi.off("reInit", syncOverflow);
+      doctorCarouselApi.off("settle", syncOverflow);
+    };
+  }, [doctorCarouselApi, visibleDoctorNotes.length]);
+
   function openCreate() {
+    setClientReadOnly(false);
     setEditingNote({ title: "", description: "", color: "red" });
     setDoctorNote(null);
     setIsOpen(true);
   }
 
   async function openEdit(note: userNote) {
+    setClientReadOnly(false);
     setEditingNote(note);
     setDoctorNote(null);
 
@@ -173,6 +213,24 @@ export default function Home() {
       }
     }
 
+    setIsOpen(true);
+  }
+
+  function openDoctorNote(note: userNote) {
+    const linkedClientNote = personalNotes.find(
+      (clientNote) => clientNote.noteId === note.clientNoteId,
+    );
+
+    setClientReadOnly(true);
+    setEditingNote(
+      linkedClientNote ?? {
+        title: "Linked client note unavailable",
+        description: "",
+        color: "green",
+        noteId: note.clientNoteId,
+      },
+    );
+    setDoctorNote(note);
     setIsOpen(true);
   }
 
@@ -226,9 +284,9 @@ export default function Home() {
           }}
           clientNote={editingNote}
           doctorNote={doctorNote}
-          clientReadOnly={false}
+          clientReadOnly={clientReadOnly}
           doctorReadOnly
-          onSaveClient={handleSaveClient}
+          onSaveClient={clientReadOnly ? undefined : handleSaveClient}
           doctorName={doctorNote?.authorName}
         />
       )}
@@ -260,6 +318,43 @@ export default function Home() {
             })}
           </div>
         </div>
+
+        <Carousel
+          setApi={setDoctorCarouselApi}
+          opts={{ align: "start", containScroll: "trimSnaps" }}
+          className="w-full"
+        >
+          <div
+            className="min-w-0"
+            style={{
+              WebkitMaskImage: `linear-gradient(to right, ${
+                doctorCanScrollPrev ? "transparent 0%, black 2.5rem" : "black 0%"
+              }, ${
+                doctorCanScrollNext
+                  ? "black calc(100% - 2.5rem), transparent 100%"
+                  : "black 100%"
+              })`,
+              maskImage: `linear-gradient(to right, ${
+                doctorCanScrollPrev ? "transparent 0%, black 2.5rem" : "black 0%"
+              }, ${
+                doctorCanScrollNext
+                  ? "black calc(100% - 2.5rem), transparent 100%"
+                  : "black 100%"
+              })`,
+            }}
+          >
+            <CarouselContent className="-ml-4 items-stretch p-3 min-h-[320px]">
+              {visibleDoctorNotes.map((note) => (
+                <CarouselItem
+                  key={note.noteId}
+                  className="basis-[300px] pl-4 md:basis-[320px]"
+                >
+                  <NoteCard note={note} onClick={() => openDoctorNote(note)} />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </div>
+        </Carousel>
       </div>
 
       <div className="mb-8 flex flex-col gap-6">
