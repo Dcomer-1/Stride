@@ -5,15 +5,14 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { createNote, showAllNotes, updateNote } from "../profileChange";
 import NoteCard from "../../components/noteCard";
-import { NoteModal } from "../../components/noteModal";
+import { SplitNoteModal } from "../../components/splitNoteModal";
+import { getDoctorNoteForClientNote } from "@/app/doctorNotesApi";
 import { Button } from "@/components/ui/button";
 import {
   Carousel,
   CarouselApi,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
 import ModeEditRoundedIcon from "@mui/icons-material/ModeEditRounded";
 import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
@@ -77,6 +76,7 @@ function formatNoteDateMonth(date?: Date | string) {
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<userNote | null>(null);
+  const [doctorNote, setDoctorNote] = useState<userNote | null>(null);
   const [personalNotes, setPersonalNotes] = useState<userNote[]>([]);
   const [filter, setFilter] = useState<NoteFilter>("week");
   const [monthCursor, setMonthCursor] = useState(() => new Date());
@@ -157,16 +157,26 @@ export default function Home() {
   }, [carouselApi, visibleNotes.length]);
 
   function openCreate() {
-    setEditingNote(null);
+    setEditingNote({ title: "", description: "", color: "red" });
+    setDoctorNote(null);
     setIsOpen(true);
   }
 
-  function openEdit(note: userNote) {
+  async function openEdit(note: userNote) {
     setEditingNote(note);
+    setDoctorNote(null);
+
+    if (note.noteId != null) {
+      const result = await getDoctorNoteForClientNote(note.noteId);
+      if (result.note) {
+        setDoctorNote(result.note);
+      }
+    }
+
     setIsOpen(true);
   }
 
-  async function handleSave(note: {
+  async function handleSaveClient(note: {
     title: string;
     description: string;
     color: string;
@@ -207,15 +217,19 @@ export default function Home() {
         <span className="inset-x-0 -bottom-0.5 h-[4px] w-3/4 rounded-full bg-black" />
       </div>
 
-      {isOpen && (
-        <NoteModal
+      {isOpen && editingNote && (
+        <SplitNoteModal
           onClose={() => {
             setIsOpen(false);
             setEditingNote(null);
+            setDoctorNote(null);
           }}
-          onSave={handleSave}
-          initialNote={editingNote ?? undefined}
-          readOnlyView={false}
+          clientNote={editingNote}
+          doctorNote={doctorNote}
+          clientReadOnly={false}
+          doctorReadOnly
+          onSaveClient={handleSaveClient}
+          doctorName={doctorNote?.authorName}
         />
       )}
 
@@ -307,10 +321,10 @@ export default function Home() {
       <Carousel
         setApi={setCarouselApi}
         opts={{ align: "start", containScroll: "trimSnaps" }}
-        className="w-full "
+        className="w-full"
       >
         <div
-          className="min-w-0  items-center "
+          className="min-w-0"
           style={{
             WebkitMaskImage: `linear-gradient(to right, ${
               canScrollPrev ? "transparent 0%, black 2.5rem" : "black 0%"
@@ -350,11 +364,8 @@ export default function Home() {
                 <span className="font-inter text-sm font-medium">New Note</span>
               </button>
             </CarouselItem>
-          </CarouselContent>
+        </CarouselContent>
         </div>
-
-        <CarouselPrevious className="-left-3 border-black bg-white text-black hover:bg-gray-100" />
-        <CarouselNext className="-right-3 border-black bg-white text-black hover:bg-gray-100" />
       </Carousel>
     </motion.div>
   );

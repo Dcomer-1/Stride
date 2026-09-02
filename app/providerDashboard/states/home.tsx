@@ -11,10 +11,12 @@ import {
   CarouselApi,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
-import { NoteModal } from "@/app/components/noteModal";
+import { SplitNoteModal } from "@/app/components/splitNoteModal";
+import {
+  getDoctorNoteForClientNote,
+  saveDoctorNote,
+} from "@/app/doctorNotesApi";
 
 function toNoteColor(value: string): NoteColor {
     if (
@@ -34,6 +36,7 @@ function mapDbNote(row: {
     description: string;
     color: string;
     created_at: string;
+    user_id?: string;
     authorName?: string;
   }): userNote {
     return {
@@ -43,6 +46,7 @@ function mapDbNote(row: {
       color: toNoteColor(row.color),
       date: row.created_at,
       authorName: row.authorName,
+      patientUserId: row.user_id,
     };
   }
 
@@ -54,6 +58,7 @@ export default function ProviderHome(){
     const [canScrollPrev, setCanScrollPrev] = useState(false);
     const [canScrollNext, setCanScrollNext] = useState(false);
     const [viewingNote, setViewingNote] = useState<userNote | null>(null);
+    const [doctorNote, setDoctorNote] = useState<userNote | null>(null);
     const [isOpen, setIsOpen] = useState(false);
 
     async function loadAllNotes(){
@@ -66,14 +71,46 @@ export default function ProviderHome(){
         setUserNotes(result.notes.map(mapDbNote));
     }
 
-    function handleNoteView(){
-        setIsOpen(!isOpen);
+    async function handleViewingNote(note: userNote) {
+        setViewingNote(note);
+        setDoctorNote(null);
 
+        if (note.noteId != null) {
+            const result = await getDoctorNoteForClientNote(note.noteId);
+            if (result.note) {
+                setDoctorNote(result.note);
+            }
+        }
+
+        setIsOpen(true);
     }
 
-    function handleViewingNote(note : userNote){
-        setViewingNote(note);
-        setIsOpen(true);
+    async function handleSaveDoctorNote(note: {
+        title: string;
+        description: string;
+        color: string;
+        noteId?: number | string;
+    }) {
+        if (!viewingNote?.noteId || !viewingNote.patientUserId) return;
+
+        const result = await saveDoctorNote({
+            clientNoteId: viewingNote.noteId,
+            patientUserId: viewingNote.patientUserId,
+            title: note.title,
+            description: note.description,
+            color: note.color,
+            noteId: note.noteId ?? doctorNote?.noteId,
+        });
+
+        if (result.error) {
+            console.error("saveDoctorNote:", result.error);
+            return;
+        }
+
+        const refreshed = await getDoctorNoteForClientNote(viewingNote.noteId);
+        if (refreshed.note) {
+            setDoctorNote(refreshed.note);
+        }
     }
 
     useEffect(() => {
@@ -130,18 +167,19 @@ export default function ProviderHome(){
                 </form>
             </div>
 
-            {isOpen && (
-                <NoteModal
+            {isOpen && viewingNote && (
+                <SplitNoteModal
                     onClose={() => {
                         setIsOpen(false);
                         setViewingNote(null);
+                        setDoctorNote(null);
                     }}
-                    initialNote={viewingNote ?? undefined}
-                    onSave={()=>{}}
-                    readOnlyView={true}
-                    date={viewingNote?.date}
-                    name={viewingNote?.authorName}
-                
+                    clientNote={viewingNote}
+                    doctorNote={doctorNote}
+                    clientReadOnly
+                    doctorReadOnly={false}
+                    onSaveDoctor={handleSaveDoctorNote}
+                    clientName={viewingNote.authorName}
                 />
             )}
 
@@ -176,21 +214,17 @@ export default function ProviderHome(){
                             })`,
                         }}
                     >
-                        <CarouselContent className="-ml-4 items-stretch p-3 min-h-[320px]">
-                            {userNotes.map((note) => (
-                                <CarouselItem
-                                    key={note.noteId}
-                                    className="basis-[300px] pl-4 md:basis-[320px]"
-
-                                >
-                                    <NoteCard note={note} onClick={() => handleViewingNote(note) } />
-                                </CarouselItem>
-                            ))}
-                        </CarouselContent>
+                    <CarouselContent className="-ml-4 items-stretch p-3 min-h-[320px]">
+                        {userNotes.map((note) => (
+                            <CarouselItem
+                                key={note.noteId}
+                                className="basis-[300px] pl-4 md:basis-[320px]"
+                            >
+                                <NoteCard note={note} onClick={() => handleViewingNote(note) } />
+                            </CarouselItem>
+                        ))}
+                    </CarouselContent>
                     </div>
-
-                    <CarouselPrevious className="-left-3 border-black bg-white text-black hover:bg-gray-100" />
-                    <CarouselNext className="-right-3 border-black bg-white text-black hover:bg-gray-100" />
                 </Carousel>
             </div>
             

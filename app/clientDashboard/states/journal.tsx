@@ -2,8 +2,9 @@
 
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
 import { useEffect, useState } from 'react';
-import { NoteModal } from '../../components/noteModal';
+import { SplitNoteModal } from '../../components/splitNoteModal';
 import { createNote, updateNote, showAllNotes } from '../profileChange';
+import { getDoctorNoteForClientNote } from '@/app/doctorNotesApi';
 import { userNote, NoteColor } from '@/app/types';
 import NoteCard from '../../components/noteCard';
 
@@ -33,6 +34,7 @@ function mapDbNote(row: {
 export default function Journal(){
     const [isOpen, setIsOpen] = useState(false);
     const [editingNote, setEditingNote] = useState<userNote | null>(null);
+    const [doctorNote, setDoctorNote] = useState<userNote | null>(null);
     const [notes, setNotes] = useState<userNote[]>([]);
 
     async function loadNotes() {
@@ -47,16 +49,26 @@ export default function Journal(){
     }, []);
 
     function openCreate() {
-        setEditingNote(null);
+        setEditingNote({ title: "", description: "", color: "red" });
+        setDoctorNote(null);
         setIsOpen(true);
     }
 
-    function openEdit(note: userNote) {
+    async function openEdit(note: userNote) {
         setEditingNote(note);
+        setDoctorNote(null);
+
+        if (note.noteId != null) {
+            const result = await getDoctorNoteForClientNote(note.noteId);
+            if (result.note) {
+                setDoctorNote(result.note);
+            }
+        }
+
         setIsOpen(true);
     }
 
-    async function handleSave(note: {
+    async function handleSaveClient(note: {
         title: string;
         description: string;
         color: string;
@@ -75,15 +87,19 @@ export default function Journal(){
     return(
         <div className="w-full flex flex-1 flex-col m-5 md:my-10 p-5 
         rounded-2xl ">
-            {isOpen && (
-                <NoteModal
+            {isOpen && editingNote && (
+                <SplitNoteModal
                     onClose={() => {
                         setIsOpen(false);
                         setEditingNote(null);
+                        setDoctorNote(null);
                     }}
-                    onSave={handleSave}
-                    initialNote={editingNote ?? undefined}
-                    readOnlyView={false}
+                    clientNote={editingNote}
+                    doctorNote={doctorNote}
+                    clientReadOnly={false}
+                    doctorReadOnly
+                    onSaveClient={handleSaveClient}
+                    doctorName={doctorNote?.authorName}
                 />
             )}
                  
