@@ -30,6 +30,4 @@ export async function POST(req: NextRequest){
         return Response.json(data)
     }
 
-    return <ClientDashboardShell profile={data}/>
-
 }

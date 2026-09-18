@@ -13,9 +13,11 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import { SplitNoteModal } from "@/app/components/splitNoteModal";
+import { PatientNotesModal } from "@/app/components/patientNotesModal";
 import {
   getDoctorNoteForClientNote,
   saveDoctorNote,
+  searchPatient,
 } from "@/app/doctorNotesApi";
 
 function toNoteColor(value: string): NoteColor {
@@ -60,6 +62,15 @@ export default function ProviderHome(){
     const [viewingNote, setViewingNote] = useState<userNote | null>(null);
     const [doctorNote, setDoctorNote] = useState<userNote | null>(null);
     const [isOpen, setIsOpen] = useState(false);
+    const [patientEmail, setPatientEmail] = useState("");
+    const [selectedPatient, setSelectedPatient] = useState<{
+        name: string;
+        email: string;
+        authUserId: string;
+    } | null>(null);
+    const [selectedPatientNotes, setSelectedPatientNotes] = useState<userNote[]>([]);
+    const [patientLookupOpen, setPatientLookupOpen] = useState(false);
+    const [lookupError, setLookupError] = useState<string | null>(null);
 
     async function loadAllNotes(){
         const result = await requestAllNotes();
@@ -113,6 +124,32 @@ export default function ProviderHome(){
         }
     }
 
+    async function handlePatientLookup(email: string) {
+        setLookupError(null);
+        const result = await searchPatient(email);
+
+        if (result.error || !result.patient) {
+            console.error(result.error);
+            setSelectedPatient(null);
+            setSelectedPatientNotes([]);
+            setLookupError(result.error ?? "No Patient Found");
+            setPatientLookupOpen(false);
+            return;
+        }
+
+        const patientName = result.patient.name;
+        setSelectedPatient(result.patient);
+        setSelectedPatientNotes(
+            result.notes.map((row) =>
+                mapDbNote({
+                    ...row,
+                    authorName: patientName,
+                }),
+            ),
+        );
+        setPatientLookupOpen(true);
+    }
+
     useEffect(() => {
         loadAllNotes();
     }, []);
@@ -147,25 +184,53 @@ export default function ProviderHome(){
                     </h2>
                     <span className="inset-x-0 -bottom-0.5 h-[4px] w-full rounded-full bg-black" />
                 </div>
-                <form className="flex w-full max-w-md max-h-1/2 items-center gap-2 
+                <form
+                    className="flex w-full max-w-md max-h-1/2 items-center gap-2 
                 rounded-2xl border-2 p-3 md:w-auto shadow-md
-                ">
+                "
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handlePatientLookup(patientEmail);
+                    }}
+                >
                     <input
-                    className="min-w-0 flex-1 rounded-2xl outline-none "
-                    placeholder="Enter Patient Email"
+                        className="min-w-0 flex-1 rounded-2xl outline-none "
+                        placeholder="Enter Patient Email"
+                        value={patientEmail}
+                        onChange={(e) => {
+                            setPatientEmail(e.target.value);
+                        }}
                     />
+                    <button type="submit" className="shrink-0 hover:cursor-pointer">
                         <Image
-                        className="shrink-0
-                        hover: cursor-pointer"
-                        width={20}
-                        height={20}
-                        src={
-                            typeof searchIcon === "string" ? searchIcon : searchIcon.src
-                        }
-                        alt="search icon"
+                            width={20}
+                            height={20}
+                            src={
+                                typeof searchIcon === "string"
+                                    ? searchIcon
+                                    : searchIcon.src
+                            }
+                            alt="search icon"
                         />
+                    </button>
                 </form>
             </div>
+
+            {lookupError && (
+                <p className="mb-4 font-inter text-base text-[#D93737]">{lookupError}</p>
+            )}
+
+            {patientLookupOpen && selectedPatient && (
+                <PatientNotesModal
+                    patientName={selectedPatient.name}
+                    patientEmail={selectedPatient.email}
+                    notes={selectedPatientNotes}
+                    onClose={() => {
+                        setPatientLookupOpen(false);
+                    }}
+                    onSelectNote={handleViewingNote}
+                />
+            )}
 
             {isOpen && viewingNote && (
                 <SplitNoteModal

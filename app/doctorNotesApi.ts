@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient as createAdminClient } from "@supabase/supabase-js";
+import { createClient as createAdminClient, SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "./lib/supabase/server";
 import type { NoteColor, userNote } from "./types";
 
@@ -217,4 +217,53 @@ export async function saveDoctorNote(input: {
   }
 
   return { success: true as const };
+}
+
+export async function searchPatient(patientEmail: string) {
+  const auth = await requireAdmin();
+  if ("error" in auth) {
+    return { error: auth.error, notes: [] as const, patient: null };
+  }
+
+  const { admin } = auth;
+  const trimmedEmail = patientEmail.trim().toLowerCase();
+
+  const { data, error } = await admin
+    .from("Users")
+    .select("auth_user_id, first_name, last_name, email")
+    .eq("email", trimmedEmail)
+    .maybeSingle();
+
+  if (error) {
+    return { error: error.message, notes: [] as const, patient: null };
+  }
+
+  if (!data) {
+    return { error: "No Patient Found", notes: [] as const, patient: null };
+  }
+
+  const { data: patientNotes, error: patientError } = await admin
+    .from("Notes")
+    .select("id, title, description, color, created_at, user_id")
+    .eq("user_id", data.auth_user_id)
+    .order("created_at", { ascending: false });
+
+  if (patientError) {
+    return {
+      error: "Problem retrieving patient notes",
+      notes: [] as const,
+      patient: null,
+    };
+  }
+
+  const name = `${data.first_name ?? ""} ${data.last_name ?? ""}`.trim();
+
+  return {
+    patient: {
+      authUserId: data.auth_user_id as string,
+      name: name || trimmedEmail,
+      email: (data.email as string) ?? trimmedEmail,
+    },
+    notes: patientNotes ?? [],
+  };
 }

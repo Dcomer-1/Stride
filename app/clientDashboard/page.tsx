@@ -24,7 +24,7 @@ export default async function ClientDashboard() {
         return Response.json({success: false , message: "Error Retrieving User Profile", errMessage : error.message})
     }
 
-    const profile : userProfile = {
+    const userProfile : userProfile = {
         first_name : data?.first_name,
         last_name : data?.last_name,
         current_weight : data?.current_weight,
@@ -38,7 +38,7 @@ export default async function ClientDashboard() {
     return (
     // need to prevent people from getting to this route if they're not signed in
     <div className="min-h-screen min-w-full bg-white overflow-x-hidden grid grid-cols-3">
-        <ClientDashboardShell profile={profile}/>
+        <ClientDashboardShell profile={userProfile}/>
     </div>
     );
 }
