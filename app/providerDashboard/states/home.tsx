@@ -232,7 +232,7 @@ export default function ProviderHome(){
             </div>
 
             <div className="grid w-full shrink-0 grid-cols-1 items-start gap-4 lg:grid-cols-2">
-                <section className="flex min-w-0 flex-col gap-3 rounded-2xl border-2  shadow-md">
+                <section className="flex min-w-0 flex-col gap-3 rounded-2xl">
                     <h2 className="w-fit border-b-4 border-black  font-serif text-3xl text-black">
                         Search For A Patient
                     </h2>
@@ -267,8 +267,10 @@ export default function ProviderHome(){
                     {lookupError && (
                         <p className="font-inter text-base text-[#D93737]">{lookupError}</p>
                     )}
-                </section>
                 <AllowListForm />
+                </section>
+                {/* Add Notification Section On the right side of the page */}
+            
             </div>
 
             {patientLookupOpen && selectedPatient && (
