@@ -1,7 +1,5 @@
 "use server"
-import { NextRequest} from "next/server";
 import {createClient} from '../lib/supabase/server';
-
 
 
 export async function updateGoal(userGoal: string){
@@ -15,6 +13,19 @@ export async function updateGoal(userGoal: string){
         return Error(updateError.message)
     }
     
+}
+
+
+export async function updateWeightAndAge(userWeight: number, userAge: number){
+    const supabase = await createClient();
+    const {data: {user}} = await supabase.auth.getUser();
+    const {error : updateError} = await supabase.from("Users")
+    .update({current_age : userAge, current_weight : userWeight})
+    .eq('auth_user_id', user?.id)
+
+    if(updateError){
+        return Error(updateError.message)
+    }
 }
 
 export async function clearGoal(){
@@ -107,3 +118,33 @@ export async function signOut(){
 
     return {sucess : true}
 }
+
+// export async function requestAllDoctorsNotes(){
+//     const supabase = await createClient();
+//     const {data: {user} , error : userError} = await supabase.auth.getUser();
+
+//     if(userError){
+//         return {error : userError.message, notes : [] as const}
+//     }
+    
+//     if(!user){
+//         return {error : "Error Retrieving User Auth for Doctor's Note Request",
+//              notes : [] as const}
+//     }
+
+//     const  {data, error : noteError} = await supabase.from("DoctorNotes")
+//     .select("id, title, description, color, created_at, author_id")
+//     .eq("patient_user_id", user.id).order("created_at", {ascending : false});
+
+    
+
+//     if(noteError){
+//         return {error : noteError.message, notes : [] as const}
+//     }
+
+//     if(!data){
+//         return {error: "No Doctor's notes are avialable", notes : [] as const}
+//     }
+
+//     return {note : (data ?? []).map((n) => {mapDoctorNote(n)})};
+// }

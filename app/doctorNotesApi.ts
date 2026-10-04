@@ -1,8 +1,9 @@
 "use server";
 
-import { createClient as createAdminClient, SupabaseClient } from "@supabase/supabase-js";
+import { createClient as createAdminClient } from "@supabase/supabase-js";
 import { createClient } from "./lib/supabase/server";
-import type { NoteColor, userNote } from "./types";
+import type { userNote } from "./types";
+import { mapDoctorNote } from "./util";
 
 function getAdminClient() {
   const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -11,38 +12,6 @@ function getAdminClient() {
     throw new Error("Missing SUPABASE_URL or SUPABASE_SECRETKEY");
   }
   return createAdminClient(url, key);
-}
-
-function toNoteColor(value: string): NoteColor {
-  if (
-    value === "red" ||
-    value === "yellow" ||
-    value === "green" ||
-    value === "purple"
-  ) {
-    return value;
-  }
-  return "green";
-}
-
-function mapDoctorNote(row: {
-  id: number | string;
-  title: string;
-  description: string;
-  color: string;
-  created_at: string;
-  author_name?: string;
-  client_note_id?: number | string;
-}): userNote {
-  return {
-    noteId: row.id,
-    title: row.title,
-    description: row.description,
-    color: toNoteColor(row.color),
-    date: row.created_at,
-    authorName: row.author_name,
-    clientNoteId: row.client_note_id,
-  };
 }
 
 async function requireAdmin() {
@@ -230,7 +199,7 @@ export async function searchPatient(patientEmail: string) {
 
   const { data, error } = await admin
     .from("Users")
-    .select("auth_user_id, first_name, last_name, email")
+    .select("auth_user_id, first_name, last_name, email,current_weight, current_age")
     .eq("email", trimmedEmail)
     .maybeSingle();
 
@@ -263,6 +232,8 @@ export async function searchPatient(patientEmail: string) {
       authUserId: data.auth_user_id as string,
       name: name || trimmedEmail,
       email: (data.email as string) ?? trimmedEmail,
+      currentAge: data.current_age,
+      currentWeight: data.current_weight
     },
     notes: patientNotes ?? [],
   };

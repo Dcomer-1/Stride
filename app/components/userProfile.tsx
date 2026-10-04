@@ -4,7 +4,7 @@ import SentimentSatisfiedRoundedIcon from '@mui/icons-material/SentimentSatisfie
 import SentimentNeutralRoundedIcon from '@mui/icons-material/SentimentNeutralRounded';
 import SentimentDissatisfiedRoundedIcon from '@mui/icons-material/SentimentDissatisfiedRounded';
 import { useEffect, useState } from 'react';
-import { updateMood } from '../clientDashboard/profileChange';
+import { updateMood, updateWeightAndAge } from '../clientDashboard/profileChange';
 import GoalField from './goalField';
 import type {userProfile} from '../types';
 import Image from 'next/image';
@@ -23,10 +23,26 @@ const userHappiness: {id: userMood, label: string, color: string, Icon: typeof S
 export default function userProfile({profile}: {profile: userProfile}){
 
     const [mood,setMood] = useState<userMood>(profile.mood);
+    const [age, setAge] = useState<number>(profile.current_age ?? 0);
+    const [weight, setWeight] = useState<number>(profile.current_weight ?? 0);
 
     useEffect(() => {
         setMood(profile.mood as userMood);
-    },[profile.mood]);
+    }, [profile.mood]);
+
+    useEffect(() => {
+        setAge(profile.current_age ?? 0);
+        setWeight(profile.current_weight ?? 0);
+    }, [profile.current_age, profile.current_weight]);
+
+    async function saveAgeAndWeight(nextAge: number, nextWeight: number) {
+        if (!Number.isFinite(nextAge) || nextAge < 0) return;
+        if (!Number.isFinite(nextWeight) || nextWeight < 0) return;
+        const result = await updateWeightAndAge(nextWeight, nextAge);
+        if (result instanceof Error) {
+            console.error(result.message);
+        }
+    }
 
     useEffect(()=>{
         updateMood(mood);
@@ -44,10 +60,36 @@ export default function userProfile({profile}: {profile: userProfile}){
             {/* retrieve client name from the database */}
         </div>
         <div className="flex flex-col justify-center items-center gap-4 mt-7">
-            <div className="bg-white h-6 w-full rounded-2xl flex p-1 px-2
-            text-black text-xs font-inter font-medium justify-between ">
-                <p> Age </p>
-                <p className=""> Weight </p>
+            <div className="bg-white h-8 w-full rounded-2xl flex items-center p-2 px-4
+            text-black text-xs font-inter font-medium justify-between gap-2">
+                <label className="flex items-center gap-1">
+                    Age:
+                    <input
+                        type="number"
+                        min={0}
+                        value={age}
+                        onChange={(e) => setAge(Number(e.target.value))}
+                        onBlur={() => saveAgeAndWeight(age, weight)}
+                        className="w-12 bg-transparent text-right outline-none 
+                        [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none 
+                        [&::-webkit-outer-spin-button]:appearance-none"
+                        aria-label="Age"
+                    />
+                </label>
+                <label className="flex items-center gap-1">
+                    Weight:
+                    <input
+                        type="number"
+                        min={0}
+                        value={weight}
+                        onChange={(e) => setWeight(Number(e.target.value))}
+                        onBlur={() => saveAgeAndWeight(age, weight)}
+                        className="w-14 bg-transparent text-right outline-none 
+                        [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none 
+                        [&::-webkit-outer-spin-button]:appearance-none"
+                        aria-label="Weight"
+                    />
+                </label>
             </div>
             <div className="flex flex-col w-full h-full font-inter text-black">
                 <h3 className="px-2 font-semibold text-[10px] mb-2">

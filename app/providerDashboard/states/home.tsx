@@ -2,7 +2,7 @@
 
 import { userNote, NoteColor } from "@/app/types";
 import { useEffect, useState } from "react";
-import { requestAllNotes } from "../providerApi";
+import { requestAllNotes, requestThisWeeksNotes } from "../providerApi";
 import Image from "next/image";
 import searchIcon from "../../../public/icons/Icon.svg"
 import NoteCard from "../../components/noteCard";
@@ -82,6 +82,16 @@ export default function ProviderHome(){
         setUserNotes(result.notes.map(mapDbNote));
     }
 
+    async function loadThisWeeksNotes(){
+        const result = await requestThisWeeksNotes();
+        if(result?.error){
+            console.error("Error Loading This Weeks Notes", result.error)
+            setUserNotes([]);
+            return;
+        }
+        setUserNotes(result?.notes.map(mapDbNote) ?? []);;
+    }
+
     async function handleViewingNote(note: userNote) {
         setViewingNote(note);
         setDoctorNote(null);
@@ -151,7 +161,7 @@ export default function ProviderHome(){
     }
 
     useEffect(() => {
-        loadAllNotes();
+        loadThisWeeksNotes();
     }, []);
 
     useEffect(() => {
@@ -178,7 +188,7 @@ export default function ProviderHome(){
         
         <div className="flex flex-col w-full m-10">
             <div className="flex w-full flex-col gap-6 md:flex-row md:items-start mb-5 md:justify-between">
-                <div className="flex min-w-0 flex-col gap-3">
+                <div className="flex min-w-0 flex-col gap-3 mb-10">
                     <h2 className="font-serif text-4xl font-light text-black md:text-6xl lg:text-[96px]">
                     Search For A Patient
                     </h2>
@@ -249,10 +259,11 @@ export default function ProviderHome(){
             )}
 
             <div className="mt-4 flex w-full flex-col gap-4">
-                <div className="flex items-end justify-between gap-4">
-                    <h3 className="font-serif text-[40px] text-black">
+                <div className="flex flex-col  justify-between gap-4 ">
+                    <h3 className="w-fit border-b-4 border-black pb-1 font-serif text-[40px] text-black">
                         This Week&apos;s Entries
                     </h3>
+            
                 </div>
 
                 <Carousel

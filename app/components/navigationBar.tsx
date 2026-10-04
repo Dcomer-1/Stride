@@ -14,17 +14,11 @@ import SettingsMenu from './settings';
 type Props = {
     active: NavItem;
     onChange: (id: NavItem) => void;
+    navIcons: {id: NavItem, label: string, Icon?: typeof EditNoteRoundedIcon}[];
 };
 
-const navIcons: {id: NavItem, label: string, Icon?: typeof EditNoteRoundedIcon}[] =[
-    {id: 'home', label: 'Home', Icon: HomeRoundedIcon },
-    {id: 'doctors notes', label: "Doctor's Notes", Icon: MedicalInformationRoundedIcon },
-    {id: 'journal', label: 'Journal', Icon: EditNoteRoundedIcon},
-    // {id: 'settings', label: 'Settings', Icon: SettingsRoundedIcon},
-    
-]
 
-export default function navigationBar({active, onChange}: Props){
+export default function navigationBar({active, onChange, navIcons}: Props){
     const [pageState, setPageState] = useState<NavItem>(active);
     
     return(

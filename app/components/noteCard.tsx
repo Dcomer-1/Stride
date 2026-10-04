@@ -6,6 +6,7 @@ import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded";
 import type { NoteColor, userNote } from "../types";
 import {motion} from "framer-motion";
 import { formatNoteDate } from "../util";
+import { cn } from "@/lib/utils";
 
 
 const NOTE_COLORS: Record<NoteColor, string> = {
@@ -25,11 +26,12 @@ const AUTHOR_COLORS: Record<NoteColor, string> = {
 type Props = {
   note: userNote;
   onClick?: () => void;
+  fill?: boolean;
 };
 
 
 
-export default function NoteCard({ note, onClick }: Props) {
+export default function NoteCard({ note, onClick, fill = false }: Props) {
   const borderColor = NOTE_COLORS[note.color] ?? NOTE_COLORS.green;
   const authorColor = AUTHOR_COLORS[note.color] ?? AUTHOR_COLORS.green;
   const isProviderCard = Boolean(note.authorName);
@@ -42,23 +44,27 @@ export default function NoteCard({ note, onClick }: Props) {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: .5, ease: 'easeIn'}}
-      className={`flex w-full max-w-[300px] flex-col rounded-[30px] p-3 pt-5 text-left
-        transition duration-200 hover:-translate-y-1 hover:cursor-pointer shadow-md
-        ${isProviderCard ? "h-[320px]" : ""}`}
+      className={cn(
+        "flex w-full max-w-[300px] flex-col rounded-[30px] p-3 pt-5 text-left shadow-md transition duration-200 hover:-translate-y-1 hover:cursor-pointer",
+        fill ? "h-full min-h-0 overflow-hidden" : isProviderCard ? "h-[320px]" : "",
+      )}
       style={{ backgroundColor: borderColor }}
-
     >
       <div className="mb-2 flex shrink-0 justify-end pr-1">
         <MoreHorizRoundedIcon sx={{ color: "rgba(0,0,0,0.35)", fontSize: 22 }} />
       </div>
 
       <div
-        className={`flex flex-col rounded-[30px] bg-white p-6 ${
-          isProviderCard ? "min-h-0 flex-1 overflow-hidden" : "min-h-[280px]"
-        }`}
+        className={cn(
+          "flex flex-col rounded-[30px] bg-white p-6",
+          fill || isProviderCard ? "min-h-0 flex-1 overflow-hidden" : "min-h-[280px]",
+        )}
       >
-        <div className="mb-3 flex shrink-0 items-start justify-between gap-3">
-          <h3 className={`font-inter text-[28px] font-medium leading-tight text-black ${isProviderCard ? "line-clamp-2" : ""}`}>
+        <div className="mb-3 flex w-full min-w-0 shrink-0 items-start justify-between gap-3">
+          <h3 className={cn(
+            "min-w-0 break-words font-inter text-[28px] font-medium leading-tight text-black",
+            fill || isProviderCard ? "line-clamp-2" : "",
+          )}>
             {note.title || "Untitled"}
           </h3>
           {isProviderCard ? (
@@ -76,9 +82,20 @@ export default function NoteCard({ note, onClick }: Props) {
           {formatNoteDate(note.date)}
         </p>
 
-        <p className={`font-inter text-xl leading-snug text-[#2B2B2B] ${isProviderCard ? "line-clamp-3 min-h-0 overflow-hidden" : "line-clamp-4"}`}>
-          {note.description}
-        </p>
+        {fill ? (
+          <div className="w-full min-w-0 shrink-0">
+            <p className={cn(
+              "w-full break-words font-inter text-xl leading-snug text-[#2B2B2B]",
+              isProviderCard ? "line-clamp-3" : "line-clamp-4",
+            )}>
+              {note.description}
+            </p>
+          </div>
+        ) : (
+          <p className={`font-inter text-xl leading-snug text-[#2B2B2B] ${isProviderCard ? "line-clamp-3 min-h-0 overflow-hidden" : "line-clamp-4"}`}>
+            {note.description}
+          </p>
+        )}
       </div>
 
       {isProviderCard && (

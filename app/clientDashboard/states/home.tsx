@@ -80,7 +80,7 @@ export default function Home() {
   const [clientReadOnly, setClientReadOnly] = useState(false);
   const [personalNotes, setPersonalNotes] = useState<userNote[]>([]);
   const [doctorNotes, setDoctorNotes] = useState<userNote[]>([]);
-  const [filter, setFilter] = useState<NoteFilter>("week");
+  const [filter, setFilter] = useState<NoteFilter>("today");
   const [monthCursor, setMonthCursor] = useState(() => new Date());
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = useState(false);
@@ -267,12 +267,12 @@ export default function Home() {
   }
 
   return (
-    <motion.div className="m-3 flex w-full flex-1 flex-col rounded-2xl p-5">
-      <div className="mb-8 flex flex-col gap-3">
-        <h2 className="font-serif text-4xl font-light text-black md:text-[96px]">
+    <motion.div className="m-3 flex h-full min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden rounded-2xl p-5">
+      <div className="mb-3 flex shrink-0 flex-col gap-2">
+        <h2 className="font-serif text-4xl font-light text-black md:text-6xl">
           MY DIET NOTES
         </h2>
-        <span className="inset-x-0 -bottom-0.5 h-[4px] w-3/4 rounded-full bg-black" />
+        <span className="h-1 w-3/4 rounded-full bg-black" />
       </div>
 
       {isOpen && editingNote && (
@@ -291,12 +291,12 @@ export default function Home() {
         />
       )}
 
-      <div className="mb-8 flex flex-col gap-6">
-        <h2 className="font-serif text-4xl text-black md:text-[40px]">
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
+        <h2 className="shrink-0 font-serif text-3xl text-black md:text-[32px]">
           Doctor&apos;s Diet Notes
         </h2>
 
-        <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="flex shrink-0 flex-wrap items-end justify-between gap-4">
           <div className="flex items-center gap-8 font-inter text-xl font-medium">
             {FILTERS.map(({ id, label }) => {
               const active = filter === id;
@@ -322,10 +322,10 @@ export default function Home() {
         <Carousel
           setApi={setDoctorCarouselApi}
           opts={{ align: "start", containScroll: "trimSnaps" }}
-          className="w-full"
+          className="flex min-h-0 w-full flex-1 flex-col"
         >
           <div
-            className="min-w-0"
+            className="h-full min-h-0 min-w-0 flex-1"
             style={{
               WebkitMaskImage: `linear-gradient(to right, ${
                 doctorCanScrollPrev ? "transparent 0%, black 2.5rem" : "black 0%"
@@ -343,13 +343,13 @@ export default function Home() {
               })`,
             }}
           >
-            <CarouselContent className="-ml-4 items-stretch p-3 min-h-[320px]">
+            <CarouselContent className="-ml-4 h-full items-stretch p-3">
               {visibleDoctorNotes.map((note) => (
                 <CarouselItem
                   key={note.noteId}
-                  className="basis-[300px] pl-4 md:basis-[320px]"
+                  className="h-full basis-[300px] pl-4 md:basis-[320px]"
                 >
-                  <NoteCard note={note} onClick={() => openDoctorNote(note)} />
+                  <NoteCard fill note={note} onClick={() => openDoctorNote(note)} />
                 </CarouselItem>
               ))}
             </CarouselContent>
@@ -357,12 +357,12 @@ export default function Home() {
         </Carousel>
       </div>
 
-      <div className="mb-8 flex flex-col gap-6">
-        <h2 className="font-serif text-4xl text-black md:text-[40px]">
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
+        <h2 className="shrink-0 font-serif text-3xl text-black md:text-[32px]">
           My Notes
         </h2>
 
-        <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="flex shrink-0 flex-wrap items-end justify-between gap-4">
           <div className="flex items-center gap-8 font-inter text-xl font-medium">
             {FILTERS.map(({ id, label }) => {
               const active = filter === id;
@@ -385,41 +385,15 @@ export default function Home() {
             })}
           </div>
 
-          <div className="flex items-center gap-2 font-inter text-sm font-medium text-[#2B2B2B]">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              className="rounded-full text-black"
-              onClick={goToPreviousMonth}
-              aria-label="Previous month"
-            >
-              <ChevronLeftRoundedIcon sx={{ fontSize: 22 }} />
-            </Button>
-            <span className="min-w-[90px] text-center">
-              {formatMonthLabel(monthCursor)}
-            </span>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              className="rounded-full text-black"
-              onClick={goToNextMonth}
-              aria-label="Next month"
-            >
-              <ChevronRightRoundedIcon sx={{ fontSize: 22 }} />
-            </Button>
-          </div>
         </div>
-      </div>
 
       <Carousel
         setApi={setCarouselApi}
         opts={{ align: "start", containScroll: "trimSnaps" }}
-        className="w-full"
+        className="flex min-h-0 w-full flex-1 flex-col"
       >
         <div
-          className="min-w-0"
+          className="h-full min-h-0 min-w-0 flex-1"
           style={{
             WebkitMaskImage: `linear-gradient(to right, ${
               canScrollPrev ? "transparent 0%, black 2.5rem" : "black 0%"
@@ -437,13 +411,13 @@ export default function Home() {
             })`,
           }}
         >
-        <CarouselContent className="-ml-4 items-center p-3 min-h-[320px]">
+        <CarouselContent className="-ml-4 h-full items-stretch p-3">
             {visibleNotes.map((note) => (
               <CarouselItem
                 key={note.noteId}
-                className="basis-[300px] pl-4 md:basis-[320px]"
+                className="h-full basis-[300px] pl-4 md:basis-[320px]"
               >
-                <NoteCard note={note} onClick={() => openEdit(note)} />
+                <NoteCard fill note={note} onClick={() => openEdit(note)} />
               </CarouselItem>
             ))}
 
@@ -462,6 +436,7 @@ export default function Home() {
         </CarouselContent>
         </div>
       </Carousel>
+      </div>
     </motion.div>
   );
 }
