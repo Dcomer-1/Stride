@@ -45,7 +45,7 @@ export default function NoteCard({ note, onClick, fill = false }: Props) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: .5, ease: 'easeIn'}}
       className={cn(
-        "flex w-full max-w-[300px] flex-col rounded-[30px] p-3 pt-5 text-left shadow-md transition duration-200 hover:-translate-y-1 hover:cursor-pointer",
+        "flex w-full min-w-[320px] flex-col rounded-[30px] p-3 pt-5 text-left shadow-md transition duration-200 hover:-translate-y-1 hover:cursor-pointer",
         fill ? "h-full min-h-0 overflow-hidden" : isProviderCard ? "h-[320px]" : "",
       )}
       style={{ backgroundColor: borderColor }}

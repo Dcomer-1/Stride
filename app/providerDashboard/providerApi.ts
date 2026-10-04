@@ -136,3 +136,54 @@ export async function requestAllNotes() {
         })),
     };
 }
+
+export async function addPatient(patient : {
+    firstName: string,
+    lastName: string,
+    email: string
+  }) {
+    const supabase = await createClient();
+    const { data : {user}} = await supabase.auth.getUser();
+    if(!user){
+        return {error : "User does not exist"}
+    }
+    const admin = getAdminClient();
+    const { data: roleRow, error: roleError } = await admin
+    .from("Users")
+    .select("role")
+    .eq("auth_user_id", user.id)
+    .maybeSingle();
+
+    if(roleError){
+        return {error : "Error Verifying Admin Role"}
+    }
+    if(roleRow?.role !== "admin"){
+        return {error : "User is not admin"}
+    }
+
+    //check if patient already exists
+    const { data: patientRow, error: patientError } = await admin.from("Users")
+    .select("auth_user_id").eq("email", patient.email).maybeSingle();
+
+    if(patientRow){
+        return {error : "Patient already exists"}
+    }
+
+    if(patientError){
+        return {error: "Error checking if  the user exists"}
+    }
+
+    //create patient
+    const { data: patientData, error: patientCreationError } = await admin.from("authorizedEmails")
+    .insert({
+        email : patient.email,
+        first_name : patient.firstName,
+        last_name : patient.lastName,
+    }).select().single();
+
+    if(patientCreationError){
+        return {error: "Error creating patient"}
+    }
+
+    return {success: "User Successfully Added To Authorized Emails"}
+}

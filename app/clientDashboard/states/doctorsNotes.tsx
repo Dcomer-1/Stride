@@ -115,7 +115,7 @@ export default function DoctorsNotePage() {
         <p className="mt-4 font-inter text-base text-[#D93737]">{loadError}</p>
       )}
 
-      <div className="mt-8 flex flex-wrap gap-6">
+      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 duration-200">
         {doctorsNotes.length === 0 && !loadError ? (
           <p className="font-inter text-xl text-[#2B2B2B]">
             No doctor&apos;s notes yet.

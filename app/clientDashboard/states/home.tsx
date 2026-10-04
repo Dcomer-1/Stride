@@ -120,8 +120,9 @@ export default function Home() {
 
   function monthFilter(notes: userNote[]) {
     const currentMonth = formatNoteDateMonth(new Date());
+    const previousMonth = formatNoteDateMonth(new Date(new Date().setMonth(new Date().getMonth() - 1)));
     return notes.filter(
-      (note) => formatNoteDateMonth(note.date) === currentMonth,
+      (note) => formatNoteDateMonth(note.date) <= currentMonth && formatNoteDateMonth(note.date) >= previousMonth,
     );
   }
 
@@ -343,7 +344,7 @@ export default function Home() {
               })`,
             }}
           >
-            <CarouselContent className="-ml-4 h-full items-stretch p-3">
+            <CarouselContent className="flex -ml-4 h-full items-stretch p-3 gap-3">
               {visibleDoctorNotes.map((note) => (
                 <CarouselItem
                   key={note.noteId}
@@ -411,7 +412,7 @@ export default function Home() {
             })`,
           }}
         >
-        <CarouselContent className="-ml-4 h-full items-stretch p-3">
+        <CarouselContent className="flex -ml-4 h-full items-stretch p-3 gap-3">
             {visibleNotes.map((note) => (
               <CarouselItem
                 key={note.noteId}

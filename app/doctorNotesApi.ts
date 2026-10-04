@@ -188,30 +188,76 @@ export async function saveDoctorNote(input: {
   return { success: true as const };
 }
 
-export async function searchPatient(patientEmail: string) {
+export async function searchPatient(patientSearch: string) {
   const auth = await requireAdmin();
   if ("error" in auth) {
     return { error: auth.error, notes: [] as const, patient: null };
   }
 
   const { admin } = auth;
-  const trimmedEmail = patientEmail.trim().toLowerCase();
+  const trimmedSearch = patientSearch.trim().toLowerCase();
+  const timmedSeachParts = trimmedSearch.split(/\s+/)
 
-  const { data, error } = await admin
+  if(trimmedSearch.includes("@")) {
+    const { data, error } = await admin
     .from("Users")
     .select("auth_user_id, first_name, last_name, email,current_weight, current_age")
-    .eq("email", trimmedEmail)
+    .eq("email", trimmedSearch)
+    .maybeSingle();
+      
+    if (error) {
+      return { error: error.message, notes: [] as const, patient: null };
+    }
+
+    if (!data) {
+      return { error: "No Patient Found", notes: [] as const, patient: null };
+    }
+
+    const { data: patientNotes, error: patientError } = await admin
+    .from("Notes")
+    .select("id, title, description, color, created_at, user_id")
+    .eq("user_id", data.auth_user_id)
+    .order("created_at", { ascending: false });
+
+  if (patientError) {
+    return {
+      error: "Problem retrieving patient notes, Please try again with a different search term",
+      notes: [] as const,
+      patient: null,
+    };
+  }
+
+  const name = `${data.first_name ?? ""} ${data.last_name ?? ""}`.trim();
+
+  return {
+    patient: {
+      authUserId: data.auth_user_id as string,
+      name: name || trimmedSearch,
+      email: (data.email as string) ?? trimmedSearch,
+      currentAge: data.current_age,
+      currentWeight: data.current_weight
+    },
+    notes: patientNotes ?? [],
+  };
+
+  } else {
+    const { data, error } = await admin
+    .from("Users")
+    .select("auth_user_id, first_name, last_name, email,current_weight, current_age")
+    .ilike("first_name", `%${timmedSeachParts[0]}%`)
+    .ilike("last_name", `%${timmedSeachParts[timmedSeachParts.length - 1]}%`)
     .maybeSingle();
 
-  if (error) {
-    return { error: error.message, notes: [] as const, patient: null };
-  }
 
-  if (!data) {
-    return { error: "No Patient Found", notes: [] as const, patient: null };
-  }
+    if (error) {
+      return { error: "Problem retrieving patient, Please try again with a different search term", notes: [] as const, patient: null };
+    }
 
-  const { data: patientNotes, error: patientError } = await admin
+    if (!data) {
+      return { error: "No Patient Found, Please try again with a different search term", notes: [] as const, patient: null };
+    }
+
+    const { data: patientNotes, error: patientError } = await admin
     .from("Notes")
     .select("id, title, description, color, created_at, user_id")
     .eq("user_id", data.auth_user_id)
@@ -230,11 +276,18 @@ export async function searchPatient(patientEmail: string) {
   return {
     patient: {
       authUserId: data.auth_user_id as string,
-      name: name || trimmedEmail,
-      email: (data.email as string) ?? trimmedEmail,
+      name: name || trimmedSearch,
+      email: (data.email as string) ?? trimmedSearch,
       currentAge: data.current_age,
       currentWeight: data.current_weight
     },
     notes: patientNotes ?? [],
   };
+  }
+
+
+
 }
+
+
+

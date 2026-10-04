@@ -34,7 +34,7 @@ export default async function ClientDashboard() {
 
     return (
     // need to prevent people from getting to this route if they're not signed in
-    <div className="min-h-screen min-w-full bg-white overflow-x-hidden grid grid-cols-3">
+    <div className="h-screen overflow-hidden bg-white">
         <ProviderDashboardShell profile={data}/>
     </div>
     );

@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/carousel";
 import { SplitNoteModal } from "@/app/components/splitNoteModal";
 import { PatientNotesModal } from "@/app/components/patientNotesModal";
+import AllowListForm from "@/app/components/allowListForm";
 import {
   getDoctorNoteForClientNote,
   saveDoctorNote,
@@ -62,7 +63,7 @@ export default function ProviderHome(){
     const [viewingNote, setViewingNote] = useState<userNote | null>(null);
     const [doctorNote, setDoctorNote] = useState<userNote | null>(null);
     const [isOpen, setIsOpen] = useState(false);
-    const [patientEmail, setPatientEmail] = useState("");
+    const [patientSearch, setPatientSearch] = useState("");
     const [selectedPatient, setSelectedPatient] = useState<{
         name: string;
         email: string;
@@ -134,9 +135,9 @@ export default function ProviderHome(){
         }
     }
 
-    async function handlePatientLookup(email: string) {
+    async function handlePatientLookup(patientSearch: string) {
         setLookupError(null);
-        const result = await searchPatient(email);
+        const result = await searchPatient(patientSearch);
 
         if (result.error || !result.patient) {
             console.error(result.error);
@@ -186,49 +187,89 @@ export default function ProviderHome(){
 
     return(
         
-        <div className="flex flex-col w-full m-10">
-            <div className="flex w-full flex-col gap-6 md:flex-row md:items-start mb-5 md:justify-between">
-                <div className="flex min-w-0 flex-col gap-3 mb-10">
-                    <h2 className="font-serif text-4xl font-light text-black md:text-6xl lg:text-[96px]">
-                    Search For A Patient
-                    </h2>
-                    <span className="inset-x-0 -bottom-0.5 h-[4px] w-full rounded-full bg-black" />
-                </div>
-                <form
-                    className="flex w-full max-w-md max-h-1/2 items-center gap-2 
-                rounded-2xl border-2 p-3 md:w-auto shadow-md
-                "
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        handlePatientLookup(patientEmail);
-                    }}
+        <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-hidden py-5 pl-4">
+            <div className="flex max-h-[500px] min-h-0 flex-1 flex-col gap-3">
+                <h3 className="w-fit shrink-0 border-b-4 border-black pb-1 font-serif text-3xl text-black">
+                    This Week&apos;s Entries
+                </h3>
+
+                <Carousel
+                    setApi={setCarouselApi}
+                    opts={{ align: "start", containScroll: "trimSnaps" }}
+                    className="flex min-h-0 w-full flex-1 flex-col"
                 >
-                    <input
-                        className="min-w-0 flex-1 rounded-2xl outline-none "
-                        placeholder="Enter Patient Email"
-                        value={patientEmail}
-                        onChange={(e) => {
-                            setPatientEmail(e.target.value);
+                    <div
+                        className="h-full min-h-0 min-w-0 flex-1"
+                        style={{
+                            WebkitMaskImage: `linear-gradient(to right, ${
+                                canScrollPrev ? "transparent 0%, black 2.5rem" : "black 0%"
+                            }, ${
+                                canScrollNext
+                                    ? "black calc(100% - 2.5rem), transparent 100%"
+                                    : "black 100%"
+                            })`,
+                            maskImage: `linear-gradient(to right, ${
+                                canScrollPrev ? "transparent 0%, black 2.5rem" : "black 0%"
+                            }, ${
+                                canScrollNext
+                                    ? "black calc(100% - 2.5rem), transparent 100%"
+                                    : "black 100%"
+                            })`,
                         }}
-                    />
-                    <button type="submit" className="shrink-0 hover:cursor-pointer">
-                        <Image
-                            width={20}
-                            height={20}
-                            src={
-                                typeof searchIcon === "string"
-                                    ? searchIcon
-                                    : searchIcon.src
-                            }
-                            alt="search icon"
-                        />
-                    </button>
-                </form>
+                    >
+                    <CarouselContent className="-ml-4 h-full items-stretch p-3">
+                        {userNotes.map((note) => (
+                            <CarouselItem
+                                key={note.noteId}
+                                className="h-full min-h-0 basis-[280px] pl-4"
+                            >
+                                <NoteCard fill note={note} onClick={() => handleViewingNote(note) } />
+                            </CarouselItem>
+                        ))}
+                    </CarouselContent>
+                    </div>
+                </Carousel>
             </div>
 
-            {lookupError && (
-                <p className="mb-4 font-inter text-base text-[#D93737]">{lookupError}</p>
-            )}
+            <div className="grid w-full shrink-0 grid-cols-1 items-start gap-4 lg:grid-cols-2">
+                <section className="flex min-w-0 flex-col gap-3 rounded-2xl border-2  shadow-md">
+                    <h2 className="w-fit border-b-4 border-black  font-serif text-3xl text-black">
+                        Search For A Patient
+                    </h2>
+                    <form
+                        className="flex w-full items-center gap-2 rounded-2xl border-2 p-3"
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            handlePatientLookup(patientSearch);
+                        }}
+                    >
+                        <input
+                            className="min-w-0 flex-1 bg-transparent font-inter outline-none"
+                            placeholder="Enter Patient Email Or Name"
+                            value={patientSearch}
+                            onChange={(e) => {
+                                setPatientSearch(e.target.value);
+                            }}
+                        />
+                        <button type="submit" className="shrink-0 hover:cursor-pointer">
+                            <Image
+                                width={20}
+                                height={20}
+                                src={
+                                    typeof searchIcon === "string"
+                                        ? searchIcon
+                                        : searchIcon.src
+                                }
+                                alt="search icon"
+                            />
+                        </button>
+                    </form>
+                    {lookupError && (
+                        <p className="font-inter text-base text-[#D93737]">{lookupError}</p>
+                    )}
+                </section>
+                <AllowListForm />
+            </div>
 
             {patientLookupOpen && selectedPatient && (
                 <PatientNotesModal
@@ -258,52 +299,6 @@ export default function ProviderHome(){
                 />
             )}
 
-            <div className="mt-4 flex w-full flex-col gap-4">
-                <div className="flex flex-col  justify-between gap-4 ">
-                    <h3 className="w-fit border-b-4 border-black pb-1 font-serif text-[40px] text-black">
-                        This Week&apos;s Entries
-                    </h3>
-            
-                </div>
-
-                <Carousel
-                    setApi={setCarouselApi}
-                    opts={{ align: "start", containScroll: "trimSnaps" }}
-                    className="w-full"
-                >
-                    <div
-                        className="min-w-0"
-                        style={{
-                            WebkitMaskImage: `linear-gradient(to right, ${
-                                canScrollPrev ? "transparent 0%, black 2.5rem" : "black 0%"
-                            }, ${
-                                canScrollNext
-                                    ? "black calc(100% - 2.5rem), transparent 100%"
-                                    : "black 100%"
-                            })`,
-                            maskImage: `linear-gradient(to right, ${
-                                canScrollPrev ? "transparent 0%, black 2.5rem" : "black 0%"
-                            }, ${
-                                canScrollNext
-                                    ? "black calc(100% - 2.5rem), transparent 100%"
-                                    : "black 100%"
-                            })`,
-                        }}
-                    >
-                    <CarouselContent className="-ml-4 items-stretch p-3 min-h-[320px]">
-                        {userNotes.map((note) => (
-                            <CarouselItem
-                                key={note.noteId}
-                                className="basis-[300px] pl-4 md:basis-[320px]"
-                            >
-                                <NoteCard note={note} onClick={() => handleViewingNote(note) } />
-                            </CarouselItem>
-                        ))}
-                    </CarouselContent>
-                    </div>
-                </Carousel>
-            </div>
-            
         </div>
 
     );

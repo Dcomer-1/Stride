@@ -23,7 +23,7 @@ export default function ProviderDashboardShell({profile} : {profile : userProfil
     ]
 
     return(
-    <div className="h-full w-screen bg-white overflow-x-hidden flex px-5">
+    <div className="flex h-full min-h-0 w-full overflow-hidden bg-white px-5">
         <NavigationBar active={tab} onChange={setTab} navIcons={navIcons} />
         {tab === 'home' && <ProviderHome/>}
     </div>
