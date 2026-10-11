@@ -21,7 +21,11 @@ export default async function ClientDashboard() {
     .maybeSingle();
 
     if(error){
-        return Response.json({success: false , message: "Error Retrieving User Profile", errMessage : error.message})
+        return (
+            <p className="p-6 font-inter text-black">
+              Error retrieving user profile: {error.message}
+            </p>
+          );
     }
 
     if(data?.role === "admin"){
