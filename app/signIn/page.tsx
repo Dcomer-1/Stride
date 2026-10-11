@@ -6,7 +6,7 @@ export default function SignInPage() {
     <div className="grid min-h-svh lg:grid-cols-2 bg-white">
       <div className="flex flex-col justify-center text-center ">
         <a className="flex items-center gap-2 text-black mb-3 p-6">logo placeholder</a>
-        <h2 className="text-5xl font-serif text-[#4C7B46] mb-2"> Ready To Start Your <br/>
+        <h2 className="md:text-4xl text-5xl font-serif text-[#4C7B46] mb-2"> Ready To Start Your <br/>
         Health Journey?</h2>
         <h3 className="text-xs text-black font-inter"> 
           Everything you need to keep your health in check - all in one place</h3>

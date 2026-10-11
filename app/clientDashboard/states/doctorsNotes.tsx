@@ -85,7 +85,7 @@ export default function DoctorsNotePage() {
   }
 
   return (
-    <div className="m-5 flex w-full flex-1 flex-col rounded-2xl p-5 md:my-10">
+    <div className="m-3 flex h-full min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden rounded-2xl p-3 md:m-5 md:p-5">
       {isOpen && clientNote && doctorNote && (
         <SplitNoteModal
           onClose={() => {
@@ -101,13 +101,13 @@ export default function DoctorsNotePage() {
         />
       )}
 
-      <div className="flex w-full gap-5 font-inter">
+      <div className="flex w-full shrink-0 gap-5 font-inter">
         <h2 className="font-serif text-5xl font-medium leading-none text-black md:text-7xl">
           Doctor&apos;s Notes
         </h2>
       </div>
-      <div className="mt-3 h-1 w-3/4 rounded-full bg-black" />
-      <p className="mt-4 font-inter text-lg text-[#2B2B2B]">
+      <div className="mt-3 h-1 w-3/4 shrink-0 rounded-full bg-black" />
+      <p className="mt-4 shrink-0 font-inter text-lg text-[#2B2B2B]">
         Notes your provider has written about your journal entries.
       </p>
 
@@ -115,7 +115,8 @@ export default function DoctorsNotePage() {
         <p className="mt-4 font-inter text-base text-[#D93737]">{loadError}</p>
       )}
 
-      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 duration-200">
+      <div className="mt-8 min-h-0 flex-1 overflow-y-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="grid grid-cols-1 gap-6 duration-200 sm:grid-cols-2 md:grid-cols-3">
         {doctorsNotes.length === 0 && !loadError ? (
           <p className="font-inter text-xl text-[#2B2B2B]">
             No doctor&apos;s notes yet.
@@ -129,6 +130,7 @@ export default function DoctorsNotePage() {
             />
           ))
         )}
+      </div>
       </div>
     </div>
   );

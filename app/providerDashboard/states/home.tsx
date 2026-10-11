@@ -187,8 +187,8 @@ export default function ProviderHome(){
 
     return(
         
-        <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-hidden py-5 pl-4">
-            <div className="flex max-h-[500px] min-h-0 flex-1 flex-col gap-3">
+        <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto px-3 py-4 md:overflow-hidden md:py-5 md:pl-4 md:pr-0">
+            <div className="flex h-[42vh] min-h-[240px] shrink-0 flex-col gap-3 md:max-h-[500px] md:min-h-0 md:flex-1">
                 <h3 className="w-fit shrink-0 border-b-4 border-black pb-1 font-serif text-3xl text-black">
                     This Week&apos;s Entries
                 </h3>
@@ -196,7 +196,7 @@ export default function ProviderHome(){
                 <Carousel
                     setApi={setCarouselApi}
                     opts={{ align: "start", containScroll: "trimSnaps" }}
-                    className="flex min-h-0 w-full flex-1 flex-col"
+                    className="flex min-h-0 w-full flex-1 touch-pan-x flex-col"
                 >
                     <div
                         className="h-full min-h-0 min-w-0 flex-1"
@@ -231,7 +231,7 @@ export default function ProviderHome(){
                 </Carousel>
             </div>
 
-            <div className="grid w-full shrink-0 grid-cols-1 items-start gap-4 lg:grid-cols-2">
+            <div className="mt-6 grid w-full shrink-0 grid-cols-1 items-start gap-4 pb-6 md:mt-20 lg:grid-cols-2">
                 <section className="flex min-w-0 flex-col gap-3 rounded-2xl">
                     <h2 className="w-fit border-b-4 border-black  font-serif text-3xl text-black">
                         Search For A Patient

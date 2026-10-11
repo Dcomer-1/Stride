@@ -85,8 +85,7 @@ export default function Journal(){
     }
 
     return(
-        <div className="w-full flex flex-1 flex-col m-5 md:my-10 p-5 
-        rounded-2xl ">
+        <div className="m-3 flex h-full min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden rounded-2xl p-3 md:m-5 md:p-5">
             {isOpen && editingNote && (
                 <SplitNoteModal
                     onClose={() => {
@@ -104,7 +103,7 @@ export default function Journal(){
             )}
                  
             {/* Top part | Section Title, Add Note and Filter */}
-            <div className="flex w-full gap-5 font-inter ">
+            <div className="flex w-full shrink-0 flex-wrap items-end gap-3 font-inter md:gap-5">
                 <button
                     onClick={openCreate}
                     className=" text-black text-sm hover:cursor-pointer "
@@ -116,16 +115,17 @@ export default function Journal(){
                     }
                     }}/>    
                 </button>
-                <h2 className="text-black text-7xl font-serif font-medium leading-none">
+                <h2 className="font-serif text-4xl font-medium leading-none text-black md:text-7xl">
                     All Notes
                 </h2>
-                <h2 className="ml-auto text-black text-2xl self-end leading-none">
+                {/* <h2 className="ml-auto self-end text-xl leading-none text-black md:text-2xl">
                     Filter
-                </h2>
+                </h2> */}
             </div>
-            <div className="mt-3 bg-black h-1 w-3/4 rounded-full"/>
+            <div className="mt-3 h-1 w-3/4 shrink-0 rounded-full bg-black"/>
 
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 duration-200">
+            <div className="mt-8 min-h-0 flex-1 overflow-y-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="grid grid-cols-1 gap-6 duration-200 sm:grid-cols-2 md:grid-cols-3">
                 {notes.map((note) => (
                     <NoteCard
                         key={note.noteId}
@@ -133,6 +133,7 @@ export default function Journal(){
                         onClick={() => openEdit(note)}
                     />
                 ))}
+            </div>
             </div>
         </div>
     );

@@ -20,7 +20,42 @@ const userHappiness: {id: userMood, label: string, color: string, Icon: typeof S
     {id:'happy', label:'Happy', color: "#45733F", Icon : SentimentSatisfiedRoundedIcon}
 ]
 
-export default function userProfile({profile}: {profile: userProfile}){
+export function MobileProfilePopup({
+    profile,
+    open,
+    onClose,
+}: {
+    profile: userProfile;
+    open: boolean;
+    onClose: () => void;
+}) {
+    if (!open) return null;
+
+    return (
+        <div
+            className="fixed inset-0 z-50 flex items-end bg-black/40 md:hidden"
+            onClick={onClose}
+        >
+            <div
+                className="max-h-[90vh] w-full overflow-y-auto"
+                onClick={(event) => event.stopPropagation()}
+            >
+                <div className="flex justify-end bg-[#EDF1EC] px-4 pt-3">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="font-inter text-sm font-medium text-black hover:cursor-pointer"
+                    >
+                        Close
+                    </button>
+                </div>
+                <UserProfile profile={profile} />
+            </div>
+        </div>
+    );
+}
+
+export default function UserProfile({profile}: {profile: userProfile}){
 
     const [mood,setMood] = useState<userMood>(profile.mood);
     const [age, setAge] = useState<number>(profile.current_age ?? 0);
@@ -49,7 +84,7 @@ export default function userProfile({profile}: {profile: userProfile}){
     },[])
 
     return(
-    <div className="flex w-fit flex-col bg-[#EDF1EC] p-5 my-5 rounded-lg">
+    <div className="flex w-full shrink-0 flex-col rounded-lg bg-[#EDF1EC] p-5 md:min-h-0 md:w-fit md:flex-1 md:overflow-y-auto">
         <div className="flex flex-col justify-center items-center gap-4 mt-10">
             <h2 className="text-black font-serif text-5xl">Welcome!</h2>
             <div className=" text-black font-semibold bg-white rounded-full p-1 mt-3 duration-300 ">

@@ -268,9 +268,9 @@ export default function Home() {
   }
 
   return (
-    <motion.div className="m-3 flex h-full min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden rounded-2xl p-5">
+    <motion.div className="m-3 flex h-full min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden rounded-2xl p-3 md:p-5">
       <div className="mb-3 flex shrink-0 flex-col gap-2">
-        <h2 className="font-serif text-4xl font-light text-black md:text-6xl">
+        <h2 className="font-serif text-3xl font-light text-black md:text-6xl">
           MY DIET NOTES
         </h2>
         <span className="h-1 w-3/4 rounded-full bg-black" />
@@ -293,12 +293,12 @@ export default function Home() {
       )}
 
       <div className="flex min-h-0 flex-1 flex-col gap-3">
-        <h2 className="shrink-0 font-serif text-3xl text-black md:text-[32px]">
+        <h2 className="shrink-0 font-serif text-2xl text-black md:text-[32px]">
           Doctor&apos;s Diet Notes
         </h2>
 
         <div className="flex shrink-0 flex-wrap items-end justify-between gap-4">
-          <div className="flex items-center gap-8 font-inter text-xl font-medium">
+          <div className="flex flex-wrap items-center gap-4 font-inter text-base font-medium md:gap-8 md:text-xl">
             {FILTERS.map(({ id, label }) => {
               const active = filter === id;
               return (
@@ -323,7 +323,7 @@ export default function Home() {
         <Carousel
           setApi={setDoctorCarouselApi}
           opts={{ align: "start", containScroll: "trimSnaps" }}
-          className="flex min-h-0 w-full flex-1 flex-col"
+          className="flex min-h-0 w-full flex-1 touch-pan-x flex-col"
         >
           <div
             className="h-full min-h-0 min-w-0 flex-1"
@@ -359,12 +359,12 @@ export default function Home() {
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col gap-3">
-        <h2 className="shrink-0 font-serif text-3xl text-black md:text-[32px]">
+        <h2 className="shrink-0 font-serif text-2xl text-black md:text-[32px]">
           My Notes
         </h2>
 
         <div className="flex shrink-0 flex-wrap items-end justify-between gap-4">
-          <div className="flex items-center gap-8 font-inter text-xl font-medium">
+          <div className="flex flex-wrap items-center gap-4 font-inter text-base font-medium md:gap-8 md:text-xl">
             {FILTERS.map(({ id, label }) => {
               const active = filter === id;
 
@@ -391,7 +391,7 @@ export default function Home() {
       <Carousel
         setApi={setCarouselApi}
         opts={{ align: "start", containScroll: "trimSnaps" }}
-        className="flex min-h-0 w-full flex-1 flex-col"
+        className="flex min-h-0 w-full flex-1 touch-pan-x flex-col"
       >
         <div
           className="h-full min-h-0 min-w-0 flex-1"

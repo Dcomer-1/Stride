@@ -1,6 +1,5 @@
 "use client"
 
-import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { signOut } from "../clientDashboard/profileChange";
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
@@ -11,13 +10,11 @@ import Image from "next/image";
 
 export default function settingsMenu(){
     const [isOpen, setIsOpen] = useState(false);
-    const router = useRouter();
     const menuRef = useRef<HTMLDivElement>(null);
 
     async function handleSignOut(){
         await signOut();
         setIsOpen(false);
-        router.push('/signIn');
     }
 
     useEffect(() => {
@@ -37,7 +34,7 @@ export default function settingsMenu(){
     },[isOpen]);
 
     return(
-        <div ref={menuRef}>
+        <div ref={menuRef} className="relative">
             <div className=" text-black bg-white rounded-full p-2  duration-300 
             hover:cursor-pointer hover:-translate-y-1"
             onClick={(e) => {
@@ -48,8 +45,8 @@ export default function settingsMenu(){
             <AnimatePresence>
             {isOpen && (
                 
-                    <motion.div className="absolute left-20 ml-2 min-w-[140px] rounded-xl
-                bg-white p-2 shadow-lg border border-gray-200 z-50"
+                    <motion.div className="absolute right-0 top-full z-50 mt-2 min-w-[140px] rounded-xl
+                border border-gray-200 bg-white p-2 shadow-lg md:left-full md:right-auto md:top-0 md:ml-2 md:mt-0"
                     key="settings-menu"
                     initial={{ opacity: 0, x: 0 }}
                     animate={{ opacity: 1, x: 8 }}

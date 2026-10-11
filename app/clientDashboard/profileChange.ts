@@ -1,4 +1,5 @@
 "use server"
+import { redirect } from "next/navigation";
 import {createClient} from '../lib/supabase/server';
 
 
@@ -116,7 +117,7 @@ export async function signOut(){
         return Error(signOutError.message)
     }
 
-    return {sucess : true}
+    redirect("/signIn");
 }
 
 // export async function requestAllDoctorsNotes(){

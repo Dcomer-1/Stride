@@ -36,7 +36,7 @@ export function SplitNoteModal({
       onClick={onClose}
     >
       <div
-        className="relative flex w-full max-w-7xl flex-col gap-4 md:flex-row"
+        className="relative flex max-h-[92vh] w-full max-w-7xl flex-col gap-4 overflow-y-auto md:flex-row"
         onClick={(e) => e.stopPropagation()}
       >
         <button

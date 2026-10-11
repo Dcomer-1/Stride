@@ -16,10 +16,11 @@ export default async function ClientDashboard() {
     if (!user) redirect("/signIn");
     const { data, error } = await supabase
       .from("Users")
-      .select("first_name,last_name,current_weight,current_age,email,mood,authorized_email_id,goal")
+      .select("first_name,last_name,current_weight,current_age,email,mood,authorized_email_id,goal,role")
       .eq("auth_user_id", user.id)
       .maybeSingle();
     if (error || !data) redirect("/signIn");
+    if (data.role !== "admin") redirect("/clientDashboard");
 
     const profile: userProfile = {
       first_name: data.first_name,
@@ -34,7 +35,7 @@ export default async function ClientDashboard() {
 
     return (
     // need to prevent people from getting to this route if they're not signed in
-    <div className="h-screen overflow-hidden bg-white">
+    <div className="h-dvh overflow-hidden bg-white">
         <ProviderDashboardShell profile={data}/>
     </div>
     );

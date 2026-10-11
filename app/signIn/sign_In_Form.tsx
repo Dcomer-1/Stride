@@ -35,12 +35,12 @@ export default function SignInForm() {
   //add pop up for when login is invalid
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col ">
       <form
         onSubmit={handleSignIn}
         className="flex flex-col border font-inter bg-white
      border-gray-300 mx-15 my-5 rounded-lg p-6 text-left text-xs
-     drop-shadow-xs text-gray-400"
+     drop-shadow-xs text-gray-400 "
       >
         <h2 className=" text-black text-xs mb-2">Email</h2>
         <input
