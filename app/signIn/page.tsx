@@ -1,4 +1,4 @@
-import FoodImage from "../../public/images/HealthyFood.svg";
+import FoodImage from "../../public/images/HealthyFood.webp";
 import SignInForm from "./sign_In_Form";
 import Image from "next/image";
 export default function SignInPage() {
