@@ -211,9 +211,10 @@ export default function Home() {
     setDoctorNoteLoading(true);
 
     if (note.noteId != null) {
-      const result = await getDoctorNoteForClientNote(note.noteId);
-      if (result.note) {
-        setDoctorNote(result.note);
+      // const result = await getDoctorNoteForClientNote(note.noteId);
+      const doctorNote = doctorNotes.find(doctorNote => doctorNote.clientNoteId === note.noteId);
+      if (doctorNote) {
+        setDoctorNote(doctorNote);
       }
     }
 

@@ -1,12 +1,14 @@
 import cookingImage from "../../public/images/CookingImage_1.webp";
 import SignUpForm from "./sign_Up_Form";
 import Image from "next/image"
-
+import logo from "../../public/images/Logo_Text.webp";
 export default function SignUpPage() {
   return (
     <div className="grid min-h-svh lg:grid-cols-2 bg-white">
       <div className="flex flex-col justify-center text-center ">
-        <a className="flex items-center gap-2 text-black mb-3 p-6">logo placeholder</a>
+        <a className="flex items-center gap-2 text-black mb-3 p-6">
+          <img src={logo.src} alt="logo" className="w-20 h-20 mx-auto" />
+        </a>
         <h2 className="md:text-4xl text-5xl font-serif text-[#4C7B46] mb-2"> Ready To Start Your <br/> Health Journey?</h2>
         <h3 className="text-xs text-black font-inter"> 
           Everything you need to keep your health in check - all in one place</h3>
