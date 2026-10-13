@@ -38,6 +38,7 @@ export default function Journal(){
     const [doctorNote, setDoctorNote] = useState<userNote | null>(null);
     const [notes, setNotes] = useState<userNote[]>([]);
     const [loading, setLoading] = useState(false);
+    const [doctorNoteLoading, setDoctorNoteLoading] = useState(false);
 
     async function loadNotes() {
         setLoading(true);
@@ -59,10 +60,9 @@ export default function Journal(){
     }
 
     async function openEdit(note: userNote) {
-        setLoading(true);
         setEditingNote(note);
         setDoctorNote(null);
-
+        setDoctorNoteLoading(true);
         if (note.noteId != null) {
             const result = await getDoctorNoteForClientNote(note.noteId);
             if (result.note) {
@@ -71,7 +71,7 @@ export default function Journal(){
         }
 
         setIsOpen(true);
-        setLoading(false);
+        setDoctorNoteLoading(false);
     }
 
     async function handleSaveClient(note: {
@@ -92,7 +92,8 @@ export default function Journal(){
 
     return(
         <div className="m-3 flex h-full min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden rounded-2xl p-3 md:m-5 md:p-5">
-            {isOpen && editingNote && (
+            {
+            isOpen && editingNote && (
                 <SplitNoteModal
                     onClose={() => {
                         setIsOpen(false);
@@ -106,6 +107,11 @@ export default function Journal(){
                     onSaveClient={handleSaveClient}
                     doctorName={doctorNote?.authorName}
                 />
+            )}
+            { doctorNoteLoading && (
+                <div className="fixed text-white inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                    <Loading color="white" />
+                </div>
             )}
                  
             {/* Top part | Section Title, Add Note and Filter */}

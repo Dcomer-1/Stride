@@ -113,9 +113,6 @@ export default function DoctorsNotePage() {
         </h2>
       </div>
       <div className="mt-3 h-1 w-3/4 shrink-0 rounded-full bg-black" />
-      <p className="mt-4 shrink-0 font-inter text-lg text-[#2B2B2B]">
-        Notes your provider has written about your journal entries.
-      </p>
 
       {loadError && (
         <p className="mt-4 font-inter text-base text-[#D93737]">{loadError}</p>

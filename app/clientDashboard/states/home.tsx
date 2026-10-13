@@ -17,6 +17,7 @@ import {
 import ModeEditRoundedIcon from "@mui/icons-material/ModeEditRounded";
 import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
+import Loading from "@/app/components/loading";
 
 type NoteFilter = "today" | "week" | "month";
 
@@ -88,6 +89,7 @@ export default function Home() {
   const [doctorCarouselApi, setDoctorCarouselApi] = useState<CarouselApi>();
   const [doctorCanScrollPrev, setDoctorCanScrollPrev] = useState(false);
   const [doctorCanScrollNext, setDoctorCanScrollNext] = useState(false);
+  const [doctorNoteLoading, setDoctorNoteLoading] = useState(false);
 
   async function loadNotes() {
     const result = await showAllNotes();
@@ -206,6 +208,7 @@ export default function Home() {
     setClientReadOnly(false);
     setEditingNote(note);
     setDoctorNote(null);
+    setDoctorNoteLoading(true);
 
     if (note.noteId != null) {
       const result = await getDoctorNoteForClientNote(note.noteId);
@@ -215,6 +218,7 @@ export default function Home() {
     }
 
     setIsOpen(true);
+    setDoctorNoteLoading(false);
   }
 
   function openDoctorNote(note: userNote) {
@@ -277,19 +281,24 @@ export default function Home() {
       </div>
 
       {isOpen && editingNote && (
-        <SplitNoteModal
-          onClose={() => {
-            setIsOpen(false);
-            setEditingNote(null);
-            setDoctorNote(null);
-          }}
-          clientNote={editingNote}
-          doctorNote={doctorNote}
-          clientReadOnly={clientReadOnly}
-          doctorReadOnly
-          onSaveClient={clientReadOnly ? undefined : handleSaveClient}
-          doctorName={doctorNote?.authorName}
-        />
+          <SplitNoteModal
+              onClose={() => {
+                  setIsOpen(false);
+                  setEditingNote(null);
+                  setDoctorNote(null);
+              }}
+              clientNote={editingNote}
+              doctorNote={doctorNote}
+              clientReadOnly={false}
+              doctorReadOnly
+              onSaveClient={handleSaveClient}
+              doctorName={doctorNote?.authorName}
+          />
+      )}
+      { doctorNoteLoading && (
+          <div className="fixed text-white inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+              <Loading color="white" />
+          </div>
       )}
 
       <div className="flex min-h-0 flex-1 flex-col gap-3">
