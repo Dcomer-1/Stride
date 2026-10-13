@@ -6,6 +6,7 @@ import NoteCard from "../../components/noteCard";
 import { getDoctorNotesForPatient } from "@/app/doctorNotesApi";
 import { showAllNotes } from "../profileChange";
 import { userNote, NoteColor } from "@/app/types";
+import Loading from "@/app/components/loading";
 
 function toNoteColor(value: string): NoteColor {
   if (
@@ -42,8 +43,10 @@ export default function DoctorsNotePage() {
   const [doctorNote, setDoctorNote] = useState<userNote | null>(null);
   const [clientNote, setClientNote] = useState<userNote | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   async function loadDoctorNotes() {
+    setLoading(true);
     const result = await getDoctorNotesForPatient();
     if (result.error) {
       console.error("getDoctorNotesForPatient:", result.error);
@@ -53,13 +56,16 @@ export default function DoctorsNotePage() {
     }
     setLoadError(null);
     setDoctorsNotes(result.notes);
+    setLoading(false);
   }
 
   async function loadPersonalNotes() {
+    setLoading(true);
     const result = await showAllNotes();
     if ("notes" in result && result.notes) {
       setPersonalNotes(result.notes.map(mapClientNote));
     }
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -117,7 +123,10 @@ export default function DoctorsNotePage() {
 
       <div className="mt-8 min-h-0 flex-1 overflow-y-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       <div className="grid grid-cols-1 gap-6 duration-200 sm:grid-cols-2 md:grid-cols-3">
-        {doctorsNotes.length === 0 && !loadError ? (
+        {loading ? (
+          <Loading />
+        ) : (
+          doctorsNotes.length === 0 && !loadError ? (
           <p className="font-inter text-xl text-[#2B2B2B]">
             No doctor&apos;s notes yet.
           </p>
@@ -129,7 +138,7 @@ export default function DoctorsNotePage() {
               onClick={() => openDoctorNote(note)}
             />
           ))
-        )}
+        ))}
       </div>
       </div>
     </div>

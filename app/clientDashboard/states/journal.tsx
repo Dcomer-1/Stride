@@ -7,6 +7,7 @@ import { createNote, updateNote, showAllNotes } from '../profileChange';
 import { getDoctorNoteForClientNote } from '@/app/doctorNotesApi';
 import { userNote, NoteColor } from '@/app/types';
 import NoteCard from '../../components/noteCard';
+import Loading from '@/app/components/loading';
 
 function toNoteColor(value: string): NoteColor {
     if (value === "red" || value === "yellow" || value === "green" || value === "purple") {
@@ -36,12 +37,15 @@ export default function Journal(){
     const [editingNote, setEditingNote] = useState<userNote | null>(null);
     const [doctorNote, setDoctorNote] = useState<userNote | null>(null);
     const [notes, setNotes] = useState<userNote[]>([]);
+    const [loading, setLoading] = useState(false);
 
     async function loadNotes() {
+        setLoading(true);
         const result = await showAllNotes();
         if ("notes" in result) {
             setNotes(result.notes.map(mapDbNote));
         }
+        setLoading(false);
     }
 
     useEffect(() => {
@@ -55,6 +59,7 @@ export default function Journal(){
     }
 
     async function openEdit(note: userNote) {
+        setLoading(true);
         setEditingNote(note);
         setDoctorNote(null);
 
@@ -66,6 +71,7 @@ export default function Journal(){
         }
 
         setIsOpen(true);
+        setLoading(false);
     }
 
     async function handleSaveClient(note: {
@@ -126,13 +132,16 @@ export default function Journal(){
 
             <div className="mt-8 min-h-0 flex-1 overflow-y-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <div className="grid grid-cols-1 gap-6 duration-200 sm:grid-cols-2 md:grid-cols-3">
-                {notes.map((note) => (
+                {loading ? (
+                    <Loading />
+                ) : (
+                    notes.map((note) => (
                     <NoteCard
                         key={note.noteId}
                         note={note}
                         onClick={() => openEdit(note)}
                     />
-                ))}
+                )))} 
             </div>
             </div>
         </div>

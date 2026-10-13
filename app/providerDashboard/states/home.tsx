@@ -20,6 +20,8 @@ import {
   saveDoctorNote,
   searchPatient,
 } from "@/app/doctorNotesApi";
+import { Loader2 } from "lucide-react";
+import Loading from "@/app/components/loading";
 
 function toNoteColor(value: string): NoteColor {
     if (
@@ -72,8 +74,10 @@ export default function ProviderHome(){
     const [selectedPatientNotes, setSelectedPatientNotes] = useState<userNote[]>([]);
     const [patientLookupOpen, setPatientLookupOpen] = useState(false);
     const [lookupError, setLookupError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
 
     async function loadAllNotes(){
+        setLoading(true);
         const result = await requestAllNotes();
         if (result.error) {
             console.error("requestAllNotes:", result.error);
@@ -81,9 +85,11 @@ export default function ProviderHome(){
             return;
         }
         setUserNotes(result.notes.map(mapDbNote));
+        setLoading(false);
     }
 
     async function loadThisWeeksNotes(){
+        setLoading(true);
         const result = await requestThisWeeksNotes();
         if(result?.error){
             console.error("Error Loading This Weeks Notes", result.error)
@@ -91,6 +97,7 @@ export default function ProviderHome(){
             return;
         }
         setUserNotes(result?.notes.map(mapDbNote) ?? []);;
+        setLoading(false);
     }
 
     async function handleViewingNote(note: userNote) {
@@ -186,14 +193,18 @@ export default function ProviderHome(){
     }, [carouselApi, userNotes.length]);
 
     return(
-        
+        <>
         <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto px-3 py-4 md:overflow-hidden md:py-5 md:pl-4 md:pr-0">
             <div className="flex h-[42vh] min-h-[240px] shrink-0 flex-col gap-3 md:max-h-[500px] md:min-h-0 md:flex-1">
                 <h3 className="w-fit shrink-0 border-b-4 border-black pb-1 font-serif text-3xl text-black">
                     This Week&apos;s Entries
                 </h3>
 
-                <Carousel
+                <div className="flex justify-center items-center h-full">
+                {loading ? (
+                    <Loading />
+                ) : ( 
+                    <Carousel
                     setApi={setCarouselApi}
                     opts={{ align: "start", containScroll: "trimSnaps" }}
                     className="flex min-h-0 w-full flex-1 touch-pan-x flex-col"
@@ -229,7 +240,11 @@ export default function ProviderHome(){
                     </CarouselContent>
                     </div>
                 </Carousel>
+                )}
+                </div>
             </div>
+            
+          
 
             <div className="mt-6 grid w-full shrink-0 grid-cols-1 items-start gap-4 pb-6 md:mt-20 lg:grid-cols-2">
                 <section className="flex min-w-0 flex-col gap-3 rounded-2xl">
@@ -302,6 +317,6 @@ export default function ProviderHome(){
             )}
 
         </div>
-
+        </>
     );
 }

@@ -43,7 +43,7 @@ export default function NoteCard({ note, onClick, fill = false }: Props) {
       onClick={onClick}
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: .5, ease: 'easeIn'}}
+      transition={{ duration: .3, ease: 'easeIn'}}
       className={cn(
         "flex w-full min-w-[320px] flex-col rounded-[30px] p-3 pt-5 text-left shadow-md transition duration-200 hover:-translate-y-1 hover:cursor-pointer",
         fill ? "h-full min-h-0 overflow-hidden" : isProviderCard ? "h-[320px]" : "",
